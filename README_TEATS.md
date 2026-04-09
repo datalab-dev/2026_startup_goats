@@ -1,5 +1,12 @@
 ## Del's README on the Teats 
 
+_Some Qs After Everything:_
+
+_1. 2-1/2" means 2+- 1/2")?_
+_2. What kind of simplifications for better for R? Like expanding the eq?_
+_3. Length of the Teat isn't explicitly measured but can be changed in the eq.__
+
+
 ## General Information/Understanding
 
 Teats are underneath the udders. What's looked at in the Booklet:
