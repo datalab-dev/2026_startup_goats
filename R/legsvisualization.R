@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggplot2)
 
 #######
 #DESMOS EQUATIONS
@@ -48,6 +49,7 @@ circle_left <- data.frame(
 )
 
 # --- plot ---
+
 ggplot() +
   geom_segment(
     data = df_segments,
