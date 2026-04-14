@@ -36,7 +36,7 @@ library(ggplot2)
 
 # --- variables where l is width between legs and r is hock (rear knee) height ---
 l <- 2
-r <- 1
+r <- 0
 
 # --- knee midline lines ---
 df_segments <- data.frame(
@@ -59,15 +59,22 @@ circle_left <- data.frame(
   y = -r + 0.75 * sin(theta)
 )
 
-# --- plot ---
+#------vertical leg lines------
+leg_height <- 20
+
+df_legs <- data.frame(
+  x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+  xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+  y = -r - leg_height/2,
+  yend = -r + leg_height/2
+)
+
+# --- plot the graph ---
 
 ggplot() +
-  geom_segment(
-    data = df_segments,
-    aes(x = x, xend = xend, y = y, yend = yend),
-    linewidth = 1
-  ) +
+  geom_segment(data = df_segments, aes(x = x, xend = xend, y = y, yend = yend), linewidth = 1) +
   geom_path(data = circle_right, aes(x, y), linewidth = 1) +
   geom_path(data = circle_left, aes(x, y), linewidth = 1) +
   coord_equal() +
+  geom_segment(data = df_legs, aes(x = x, xend = xend, y = y, yend = yend), linewidth = 1) +
   theme_minimal()
