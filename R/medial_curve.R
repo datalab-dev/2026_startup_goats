@@ -117,33 +117,42 @@ get_udder_depth_score <- function(o, r) {
 }
 
 # Parameter section in decimals - EXPERIMENT WITH THIS
-o_param = 13.0
-p_param = 1.0
-q_param = 0.15
-l_param = 5.0
-r_param = 14.3
+# o_param = 13.0
+# p_param = 1.0
+# q_param = 0.15
+# l_param = 5.0
+# r_param = 14.3
 
 # generate curve data
-left_df  <- generate_left_curve(o_param, p_param, q_param, l_param)
-right_df  <- generate_right_curve(o_param, p_param, q_param, l_param)
-medial_df <- rbind(left_df, right_df)
 
-head(left_df)
-tail(left_df)
+medial_visualization <- function(o_param, p_param, q_param, l_param, r_param) {
 
-head(right_df)
-tail(right_df)
+  left_df  <- generate_left_curve(o_param, p_param, q_param, l_param)
+  right_df  <- generate_right_curve(o_param, p_param, q_param, l_param)
+  medial_df <- rbind(left_df, right_df)
 
+  head(left_df)
+  tail(left_df)
 
-ggplot(medial_df) +
-  aes(x = x, y = y) +
-  geom_point() +
-  geom_hline(yintercept = -r_param, linetype = "dashed", color = "blue") 
+  head(right_df)
+  tail(right_df)
 
 
-print("Medial Score:")
-print(get_medial_score(p_param, q_param))
+  ggplot(medial_df) +
+    aes(x = x, y = y) +
+    geom_point() +
+    geom_hline(yintercept = -r_param, linetype = "dashed", color = "blue") 
 
-print("Udder Depth Score:")
-print(get_udder_depth_score(o_param, r_param))
 
+  print("Medial Score:")
+  print(get_medial_score(p_param, q_param))
+
+  print("Udder Depth Score:")
+  print(get_udder_depth_score(o_param, r_param))
+
+
+}
+
+if (sys.nframe() == 0) {
+    medial_visualization(13.0, 1.0, 0.15, 5.0, 14.3)
+  }
