@@ -4,6 +4,7 @@
 # f(x) = -a(x + s)^(-1/2) + d{-l < x <0}
 # m(x) < y < f(x)
 # w(x) = -a(-x + s)^(-1/2) + d{l > x > 0}
+# n(x) < y < w(x)
 
 # Parameters
 # d = udder arch height
@@ -69,11 +70,13 @@ plot_udder_arch <- function(a, d, s, l, hock_height = 0, n_points = 300) {
 }
 
 # Parameters
-a_param <- 19
-d_param <- 2
-s_param <- 6.2
-l_param <- 4.5
+a_param <- 17
+d_param <- 10
+s_param <- 3
+l_param <- 2 # leg parameter 
 hock_param <- 0
+
+
 
 # Create plot
 p <- plot_udder_arch(
