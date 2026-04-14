@@ -60,3 +60,5 @@ where:
 - q is the roundness of the teat, does the sharpness (this is dependent on the medial)
 - o is the length of the udder, also affects another equation (medial
 	- o and q are discrete and I think independent, like doesn't affect the teats at all really? Just the placement in the graph.
+- u is the length of the teat (not mentioned in the rating systems) 
+
