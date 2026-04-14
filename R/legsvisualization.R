@@ -5,15 +5,26 @@ library(ggplot2)
 #DESMOS EQUATIONS
 #######
 
-#left and right leg
+#r = hock height
+#l = width between legs
+
+#left and right leg; effectively shade out two vertical 
+#strips on the graph and l controls how far apart they are 
+
 #  l+2>x>l
 # -(l+2)<x<-l
 
-#halfway point through knees
+
+#halfway point through knees; change in vertical position
+#depending on r value and horizontal positions on l value 
+
 # y=-r{l+2>x>l}
 # y=-r{-(l+2)<x<-l}
 
-#knee circles
+
+#knee circles; simply circle equations that change in vertical position
+#depending on r value and horizontal positions on l value 
+
 # (x-(l+1))^{2}+(y+r)^{2}=.75^{2}
 # (x+(l+1))^{2}+(y+r)^{2}=.75^{2}
 
