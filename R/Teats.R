@@ -18,6 +18,85 @@
 
 library(tidyverse)
 
+generate_left_teat = function(j, q, o, u, h, l, n_points = 200) {
+  x <- seq(-l, 0, length.out = n_points)
+  y <- h * (x + j) * (x + (q + j)) - (o + u)
+  data.frame(x = x, y = y)
+}
+
+generate_right_teat = function(j, q, o, u, h, l, n_points = 200) {
+  x <- seq(0, l, length.out = n_points)
+  y <- h * (x - j) * (x - (q + j)) - (o + u)
+  data.frame(x = x, y = y)
+}
+
+teat_visualization <- function(j_param, q_param, o_param, u_param, h_param, l_param) {
+  
+  left_df  <- generate_left_teat(j_param, q_param, o_param, u_param, h_param, l_param)
+  right_df <- generate_right_teat(j_param, q_param, o_param, u_param, h_param, l_param)
+  
+  teat_df <- rbind(left_df, right_df)
+  
+  ggplot(teat_df, aes(x = x, y = y)) +
+    geom_line() +
+    theme_minimal() + 
+    xlim(-20, 20) + ylim(-30, 30)
+}
+
+teat_visualization(
+  j_param = 5,
+  q_param = 8,
+  o_param = 13.0, 
+  u_param = 2.0, # length
+  h_param = 1.5, # Roundness (smaller = flatter)
+  l_param = 10 # Leg Boundaries
+)
+
+# Wanted to make a slider to make things easier, chatgpt gave, honestly idk what's going on here: 
+
+# install.packages("shiny")
+library(shiny)
+
+# --- UI (sliders) ---
+ui <- fluidPage(
+  titlePanel("Teat Model"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("j", "Placement (j)", min = 0, max = 5, value = 2.5),
+      sliderInput("q", "Roundness (q)", min = 0, max = 2, value = 0.3),
+      sliderInput("o", "Udder Height (o)", min = 0, max = 20, value = 13),
+      sliderInput("u", "Teat Length (u)", min = 0, max = 5, value = 2),
+      sliderInput("h", "Width (h)", min = 0.1, max = 3, value = 1.5),
+      sliderInput("l", "Boundary (l)", min = 1, max = 10, value = 5)
+    ),
+    
+    mainPanel(
+      plotOutput("teatPlot")
+    )
+  )
+)
+
+# --- server (reactive plot) ---
+server <- function(input, output) {
+  
+  output$teatPlot <- renderPlot({
+    
+    left_df  <- generate_left_teat(input$j, input$q, input$o, input$u, input$h, input$l)
+    right_df <- generate_right_teat(input$j, input$q, input$o, input$u, input$h, input$l)
+    
+    df <- rbind(left_df, right_df)
+    
+    ggplot(df, aes(x = x, y = y)) +
+      geom_line() +
+      coord_fixed(xlim = c(-20, 20), ylim = c(-50, 30)) +
+      theme_minimal()
+  })
+}
+
+# run app
+shinyApp(ui = ui, server = server)
+
 ## Loading Some Data to Use/ Cleaning just for me. 
 
 goats = read.csv("data/goats-la-data-cleaned.csv")
@@ -41,60 +120,30 @@ teats_subset = goats_subset %>%
 
 teats_subset
 
-## Start working with the Equation:
+# Translating Points to Inches (input in the ggplot)
 
-# Expanded Equation
-# t(x) = h − x² + jx + q + jo + u
-# k(x) = h − x² − jx − q + jo + u
+# LINEAR SCALE – TEAT LENGTH
+# Standard Numbers 
 
-# m > y > t(x)
-# n > y > k(x)
+# 5.0”  50
+# 4.5”  45
+# 4.0”  40
+# 3.5”  35
+# 3.0”  30
+# 2.5”  25
+# 2.0”  20
+# 1.5”  15
+# 1.0”  10
+# 0.5”  5
 
-# parameters
-o = 0      # udder height
-p = 1.6    # spacing (used later for medial)
-q = 0.3    # depth influence
-j = 2.5    # placement
-u = 2      # length
-h = 1.5    # diameter/shape
+View(teats_subset)
 
-# right teat
+trf_length = teats_subset$Teat.Length[1:5]/10
+trf_length
 
-t_rfun <- function(x) {
-  -x^2 + j*x + q + j*o + u
-}
+# trf_dia = teats_subset$Teat.Diameter[1:5]
 
-k_rfun <- function(x) {
-  -x^2 + j*x + q + j*o
-}
+trf_plc = teats_subset$Teat.Placement
 
-#left teat
-t_lfun <- function(x) {
-  -x^2 - j*x + q - j*o + u
-}
 
-k_lfun <- function(x) {
-  -x^2 - j*x + q - j*o
-}
 
-# sample x values
-x_vals = seq(-10, 10, length.out = 1000)
-
-# create data for curves
-curve_data = data.frame(
-  x = c(x_vals, x_vals, x_vals, x_vals),
-  y = c(
-    t_rfun(x_vals),
-    k_rfun(x_vals),
-    t_lfun(x_vals),
-    k_lfun(x_vals)
-  ),
-  curve = rep(c("t_right", "k_right", "t_left", "k_left"), each = length(x_vals))
-)
-  
-# plot
-ggplot(curve_data, aes(x, y, color = curve)) +
-  geom_line(size = 1) +
-  coord_fixed() +
-  theme_minimal() +
-  labs(title = "Teat Boundaries Only")
