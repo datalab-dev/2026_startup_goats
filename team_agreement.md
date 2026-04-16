@@ -24,7 +24,7 @@ All team members are expected to take notes during full team meetings. Team memb
 
 ## Communication Expectations
 
-There will be 2 main channels of communication that this team will use: the main Slack channel, 2026_smith_goat, and a separate channel consisting of only student members for smaller questions. Timely responses are expected within 24 hours on Slack. Additionally, we will utilize GitHub Issues for any other problems. 
+There will be 2 main channels of communication that this team will use: the main Slack channel, 2026_smith_goat, and a separate channel consisting of only student members for smaller questions. Timely responses are expected within 24 hours on Slack on weekdays. Additionally, we will utilize GitHub Issues for any other problems. 
 
 ### Communication Through Slack
 
