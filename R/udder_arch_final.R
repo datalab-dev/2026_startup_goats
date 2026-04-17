@@ -1,0 +1,74 @@
+# Udder Arch Condense
+
+# Desmos equation 
+# f(x) = -a(x + s)^(-1/2) + d{-l < x <0}
+# m(x) < y < f(x)
+# w(x) = -a(-x + s)^(-1/2) + d{l > x > 0}
+# n(x) < y < w(x)
+
+# Parameters
+# d = udder arch height
+# a = udder arch (roundness)
+# s = udder arch (attachment shape)
+
+# a_param / a - arch roundness
+# d_param / d -  arch height
+# s_param / s  -  udder arch shape (must be > l if using this curve type)
+# l_param / l- inner leg part where it stops
+# pelvic arch - blue point representing the origin 
+
+
+generate_arch <- function(a, d, s, l, n_points = 300) {
+  
+  x <- seq(-l, l, length.out = n_points)
+  
+  if (any(s - abs(x) <= 0)) {
+    stop("Need s > l so that s - |x| > 0 for all x.")
+  }
+  
+  y <- -a * (s - abs(x))^(-1/2) + d
+  
+  side <- ifelse(x < 0, "left", "right")
+  
+  data.frame(x = x, y = y, side = side)
+}
+
+# Parameters
+a_param <- 14
+d_param <- 14 # height
+s_param <- 3
+l_param <- 2 # leg parameter 
+
+generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
+  
+  left_df  <- generate_left_arch(a, d, s, l, n_points)
+  right_df <- generate_right_arch(a, d, s, l, n_points)
+  
+  arch_df <- rbind(left_df, right_df)
+  
+  ggplot(arch_df, aes(x = x, y = y)) +
+    geom_line(color = "black", linewidth = 1.2) +
+    # geom_hline(yintercept = hock_height, linetype = "dashed", color = "blue") +
+    geom_vline(xintercept = c(-l, l), linetype = "dotted") +
+    coord_equal() +
+    theme_minimal() +
+    labs(
+      title = "Goat Udder Arch",
+      subtitle = paste("a =", a, "| d =", d, "| s =", s, "| l =", l),
+      x = "Horizontal position",
+      y = "Vertical position"
+    )
+}
+
+# add pelvic arch to this as a reference point (maybe like a red or blue dot to help understand it)
+
+# Create plot
+p <- plot_udder_arch(
+  a = a_param,
+  d = d_param,
+  s = s_param,
+  l = l_param,
+)
+
+print(p)
+
