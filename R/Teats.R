@@ -11,64 +11,76 @@
 # where:
 # j is the distance from origin or x = 0, does halve the singular teat when j = 0
 # q is the roundness of the teat, the sharpness (this is dependent on the medial)
-# o is the length of the udder, also affects another equation (medial)
+# o is where the udder starts from the (medial)
 # o and q are discrete and I think independent, like doesn't affect the teats at all really? Just the placement in the$
 # u is the length of the teat (not mentioned in the rating systems)
 # h is the width of the teat 
 
 library(tidyverse)
 
-generate_left_teat = function(j, q, o, u, h, l, n_points = 200) {
-  x <- seq(-l, 0, length.out = n_points)
-  y <- h * (x + j) * (x + (q + j)) - (o + u)
-  data.frame(x = x, y = y)
-}
-
-generate_right_teat = function(j, q, o, u, h, l, n_points = 200) {
-  x <- seq(0, l, length.out = n_points)
-  y <- h * (x - j) * (x - (q + j)) - (o + u)
-  data.frame(x = x, y = y)
-}
-
-teat_visualization <- function(j_param, q_param, o_param, u_param, h_param, l_param) {
+teat_model <- function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 200) {
   
-  left_df  <- generate_left_teat(j_param, q_param, o_param, u_param, h_param, l_param)
-  right_df <- generate_right_teat(j_param, q_param, o_param, u_param, h_param, l_param)
+# converting teat scores to inches 
+  if (!is.null(teat_length_score)) {
+    if (teat_length_score == 50) u = 5.0
+    else if (teat_length_score == 45) u = 4.5
+    else if (teat_length_score == 40) u = 4.0
+    else if (teat_length_score == 35) u = 3.5
+    else if (teat_length_score == 30) u = 3.0
+    else if (teat_length_score == 25) u = 2.5
+    else if (teat_length_score == 20) u = 2.0
+    else if (teat_length_score == 15) u = 1.5
+    else if (teat_length_score == 10) u = 1.0
+    else if (teat_length_score == 5)  u = 0.5
+  }
   
-  teat_df <- rbind(left_df, right_df)
+  #equation 
   
-  ggplot(teat_df, aes(x = x, y = y)) +
+  x_left  = seq(-l, 0, length.out = n_points)
+  x_right = seq(0, l, length.out = n_points)
+  
+  y_left  = h * (x_left + j) * (x_left + (q + j)) - (o + u)
+  y_right = h * (x_right - j) * (x_right - (q + j)) - (o + u)
+  
+  df = rbind(
+    data.frame(x = x_left,  y = y_left),
+    data.frame(x = x_right, y = y_right)
+  )
+  
+ # plot
+  ggplot(df, aes(x = x, y = y)) +
     geom_line() +
-    theme_minimal() + 
-    xlim(-20, 20) + ylim(-30, 30)
+    coord_fixed(xlim = c(-20, 20), ylim = c(-30, 10)) +
+    theme_minimal()
 }
 
-teat_visualization(
-  j_param = 5,
-  q_param = 8,
-  o_param = 13.0, 
-  u_param = 2.0, # length
-  h_param = 1.5, # Roundness (smaller = flatter)
-  l_param = 10 # Leg Boundaries
-)
+if (sys.nframe() == 0) {
+  teat_model(
+    j = 2,
+    q = 3,
+    o = 5,
+    u = 2,
+    h = 1.5,
+    l = 10
+  )
+}
 
-# Wanted to make a slider to make things easier, chatgpt gave, honestly idk what's going on here: 
-
+# refined ver of the shiny UI 
 # install.packages("shiny")
+
 library(shiny)
 
-# --- UI (sliders) ---
-ui <- fluidPage(
+ui = fluidPage(
   titlePanel("Teat Model"),
   
   sidebarLayout(
     sidebarPanel(
       sliderInput("j", "Placement (j)", min = 0, max = 5, value = 2.5),
-      sliderInput("q", "Roundness (q)", min = 0, max = 2, value = 0.3),
-      sliderInput("o", "Udder Height (o)", min = 0, max = 20, value = 13),
+      sliderInput("q", "Roundness (q)", min = 0, max = 6, value = 3),
+      sliderInput("o", "Medial Attachment (o)", min = 0, max = 20, value = 13),
       sliderInput("u", "Teat Length (u)", min = 0, max = 5, value = 2),
-      sliderInput("h", "Width (h)", min = 0.1, max = 3, value = 1.5),
-      sliderInput("l", "Boundary (l)", min = 1, max = 10, value = 5)
+      sliderInput("h", "Width (h) (larger number = skinnier)", min = 0.1, max = 3, value = 1.5),
+      sliderInput("l", "Boundary (l)", min = 5, max = 20, value = 10)
     ),
     
     mainPanel(
@@ -77,20 +89,20 @@ ui <- fluidPage(
   )
 )
 
-# --- server (reactive plot) ---
-server <- function(input, output) {
+# server
+server = function(input, output) {
   
-  output$teatPlot <- renderPlot({
+  output$teatPlot = renderPlot({
     
-    left_df  <- generate_left_teat(input$j, input$q, input$o, input$u, input$h, input$l)
-    right_df <- generate_right_teat(input$j, input$q, input$o, input$u, input$h, input$l)
+    teat_model(
+      j = input$j,
+      q = input$q,
+      o = input$o,
+      u = input$u,
+      h = input$h,
+      l = input$l
+    )
     
-    df <- rbind(left_df, right_df)
-    
-    ggplot(df, aes(x = x, y = y)) +
-      geom_line() +
-      coord_fixed(xlim = c(-20, 20), ylim = c(-50, 30)) +
-      theme_minimal()
   })
 }
 
@@ -120,7 +132,7 @@ teats_subset = goats_subset %>%
 
 teats_subset
 
-# Translating Points to Inches (input in the ggplot)
+# Translating Points to Inches 
 
 # LINEAR SCALE – TEAT LENGTH
 # Standard Numbers 
