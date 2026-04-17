@@ -46,6 +46,7 @@ df_segments <- data.frame(
   yend = c(-r, -r)
 )
 
+
 # --- knee circles ---
 theta <- seq(0, 2*pi, length.out = 300)
 
@@ -59,6 +60,8 @@ circle_left <- data.frame(
   y = -r + 0.75 * sin(theta)
 )
 
+
+
 #------vertical leg lines------
 leg_height <- 20
 
@@ -69,6 +72,8 @@ df_legs <- data.frame(
   yend = -r + leg_height/2
 )
 
+
+
 # --- plot the graph ---
 
 ggplot() +
@@ -78,3 +83,72 @@ ggplot() +
   coord_equal() +
   geom_segment(data = df_legs, aes(x = x, xend = xend, y = y, yend = yend), linewidth = 1) +
   theme_minimal()
+
+
+
+##############
+#SHAPE FUNCTIONS
+##############
+
+#first try __________________________________________
+#hockmidline <- function(r, l) {
+  #df_segments <- data.frame(
+   # x    = c(l, -(l+2)),
+   # xend = c(l+2, -l),
+   # y    = c(-r, -r),
+   # yend = c(-r, -r))}
+
+
+hockmidline <- function(r, l) {
+  df_segments <- data.frame(
+    x    = c(l, -(l+2)),
+    xend = c(l+2, -l),
+    y    = c(-r, -r),
+    yend = c(-r, -r)
+  )
+  return(df_segments)
+}
+
+#first try __________________________________________
+#hocks <- function(r, l) {
+  #theta <- seq(0, 2*pi, length.out = 300)
+  
+ # circle_right <- data.frame(
+  #  x = (l+1) + 0.75 * cos(theta),
+   # y = -r + 0.75 * sin(theta))
+  
+  #circle_left <- data.frame(
+   # x = -(l+1) + 0.75 * cos(theta),
+  #  y = -r + 0.75 * sin(theta))}
+
+hocks <- function(r, l) {
+  theta <- seq(0, 2*pi, length.out = 300)
+  
+  circle_right <- data.frame(
+    x = (l+1) + 0.75 * cos(theta),
+    y = -r + 0.75 * sin(theta),
+    side = "right")
+  
+  circle_left <- data.frame(
+    x = -(l+1) + 0.75 * cos(theta),
+    y = -r + 0.75 * sin(theta),
+    side = "left")
+  
+  return(rbind(circle_right, circle_left))}
+
+#first try ___________________________________________
+#legs <- function(r, l, leg_height) {
+#  df_legs <- data.frame(
+#    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+#    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+#    y = -r - leg_height/2,
+#    yend = -r + leg_height/2)}
+
+legs <- function(r, l, leg_height) {
+  df_legs <- data.frame(
+    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+    y = -r - leg_height/2,
+    yend = -r + leg_height/2
+  )
+  return(df_legs)}
