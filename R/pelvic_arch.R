@@ -17,21 +17,30 @@
 
 library(ggplot2)
 
-# setting l to the initial value of 4.6 as specified by the desmos visulalization
-l = 4.6
+pelvic_arch_df <- function(l) {
+  l_x = seq(-l, 0, length.out = 200)
+  left_arch_eq = -0.03 * l_x * (l_x + 5)
+  left_arch <- data.frame(x = l_x, y = left_arch_eq)
+  
+  r_x = seq(0, l, length.out = 200)
+  right_arch_eq = -0.03 * r_x * (r_x - 5)
+  right_arch = data.frame(x = r_x, y = right_arch_eq)
+  
+  
+  pelvic_arch <- rbind(right_arch, left_arch)
+}
 
-l_x = seq(-l, 0, length.out = 200)
-left_arch_eq = -0.03 * l_x * (l_x + 5)
-left_arch <- data.frame(x = l_x, y = left_arch_eq)
-
-r_x = seq(0, l, length.out = 200)
-right_arch_eq = -0.03 * r_x * (r_x - 5)
-right_arch = data.frame(x = r_x, y = right_arch_eq)
-
-
-pelvic_arch <- rbind(right_arch, left_arch)
 
 # drawing the pelvic arch
-ggplot(pelvic_arch) +
-  aes(x, y) +
-  geom_line()
+pelvic_arch_visualization <- function(l) {
+  pelvic_arch <- pelvic_arch_df(l)
+  
+  ggplot(pelvic_arch) +
+    aes(x, y) +
+    geom_line()
+}
+
+if(sys.nframe() == 0) {
+  # setting l to the initial value of 4.6 as specified by the desmos visulalization
+  pelvic_arch_visualization(4.6)
+}
