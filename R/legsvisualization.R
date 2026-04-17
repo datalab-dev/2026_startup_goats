@@ -152,3 +152,17 @@ legs <- function(r, l, leg_height) {
     yend = -r + leg_height/2
   )
   return(df_legs)}
+
+
+
+
+###################
+# COMBINED FUNCTION
+####################
+
+
+full_legs <- function(r, l, leg_height) {
+  list(
+    midline = hockmidline(r, l),
+    legs    = legs(r, l, leg_height),
+    hocks   = hocks(r, l))}
