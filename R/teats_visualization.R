@@ -18,7 +18,7 @@
 
 library(tidyverse)
 
-teat_model <- function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 200) {
+teat_model = function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 200) {
   
 # converting teat scores to inches 
   if (!is.null(teat_length_score)) {
@@ -52,17 +52,6 @@ teat_model <- function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 20
     geom_line() +
     coord_fixed(xlim = c(-20, 20), ylim = c(-30, 10)) +
     theme_minimal()
-}
-
-if (sys.nframe() == 0) {
-  teat_model(
-    j = 2,
-    q = 3,
-    o = 5,
-    u = 2,
-    h = 1.5,
-    l = 10
-  )
 }
 
 # refined ver of the shiny UI 
@@ -106,56 +95,12 @@ server = function(input, output) {
   })
 }
 
-# run app
-shinyApp(ui = ui, server = server)
+# function to run the app
+run_teat_app = function() {
+  shinyApp(ui = ui, server = server)
+}
 
-## Loading Some Data to Use/ Cleaning just for me. 
-
-goats = read.csv("data/goats-la-data-cleaned.csv")
-
-View(goats)
-
-str(goats)
-
-library(dplyr)
-
-goats_subset = goats %>%
-  select(Size, UdderDepth, Rear.Udder.Height, Rear.Udder.Arch, 
-         Medial.Suspensory.Ligament, Teat.Placement, 
-         Teat.Diameter, Teat.Length)
-
-goats_subset
-
-teats_subset = goats_subset %>% 
-  select(Size, Teat.Placement, 
-         Teat.Diameter, Teat.Length)
-
-teats_subset
-
-# Translating Points to Inches 
-
-# LINEAR SCALE – TEAT LENGTH
-# Standard Numbers 
-
-# 5.0”  50
-# 4.5”  45
-# 4.0”  40
-# 3.5”  35
-# 3.0”  30
-# 2.5”  25
-# 2.0”  20
-# 1.5”  15
-# 1.0”  10
-# 0.5”  5
-
-View(teats_subset)
-
-trf_length = teats_subset$Teat.Length[1:5]/10
-trf_length
-
-# trf_dia = teats_subset$Teat.Diameter[1:5]
-
-trf_plc = teats_subset$Teat.Placement
-
-
-
+# run the shiny app only when this script is executed directly
+if (sys.nframe() == 0) {
+  run_teat_app()
+}
