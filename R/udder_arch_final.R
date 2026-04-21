@@ -60,15 +60,16 @@ generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
     )
 }
 
-# add pelvic arch to this as a reference point (maybe like a red or blue dot to help understand it)
+main <- function() {
+  a_param <- 14
+  d_param <- 14
+  s_param <- 3
+  l_param <- 2
+  
+  p <- plot_udder_arch(a_param, d_param, s_param, l_param)
+  print(p)
+}
 
-# Create plot
-p <- plot_udder_arch(
-  a = a_param,
-  d = d_param,
-  s = s_param,
-  l = l_param,
-)
-
-print(p)
-
+if (sys.nframe() == 0) {
+  main()
+}
