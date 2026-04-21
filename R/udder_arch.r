@@ -1,4 +1,4 @@
-# Udder Arch Draft
+# Udder Arch Condensed
 
 # Desmos equation 
 # f(x) = -a(x + s)^(-1/2) + d{-l < x <0}
@@ -17,46 +17,31 @@
 # l_param / l- inner leg part where it stops
 # pelvic arch - blue point representing the origin 
 
-library(ggplot2)
 
-# Left side
-generate_left_arch <- function(a, d, s, l, n_points = 300) { # generate the x point
-  x <- seq(-l, 0, length.out = n_points)
+generate_arch <- function(a, d, s, l, n_points = 300) {
   
-  if (any(x + s <= 0)) {
-    stop("Need x + s > 0. Make sure s > l.") # makes sure it doesnt go into the legs
+  x <- seq(-l, l, length.out = n_points)
+  
+  if (any(s - abs(x) <= 0)) {
+    stop("Need s > l so that s - |x| > 0 for all x.")
   }
   
-  y <- -a * (x + s)^(-1/2) + d # applies the equation.
-  data.frame(x = x, y = y, side = "left")
+  y <- -a * (s - abs(x))^(-1/2) + d
+  
+  side <- ifelse(x < 0, "left", "right")
+  
+  data.frame(x = x, y = y, side = side)
 }
 
-# Right side
-generate_right_arch <- function(a, d, s, l, n_points = 300) {
-  x <- seq(0, l, length.out = n_points)
+generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
   
-  if (any(-x + s <= 0)) {
-    stop("Need -x + s > 0. Make sure s > l.")
-  }
-  
-  y <- -a * (-x + s)^(-1/2) + d
-  data.frame(x = x, y = y, side = "right")
-}
-
-# Combine both sides
-generate_udder_arch <- function(a, d, s, l, n_points = 300) {
   left_df  <- generate_left_arch(a, d, s, l, n_points)
   right_df <- generate_right_arch(a, d, s, l, n_points)
-  rbind(left_df, right_df)
-}
-
-# Plot
-plot_udder_arch <- function(a, d, s, l,  n_points = 300) {
-  arch_df <- generate_udder_arch(a, d, s, l, n_points)
+  
+  arch_df <- rbind(left_df, right_df)
   
   ggplot(arch_df, aes(x = x, y = y)) +
     geom_line(color = "black", linewidth = 1.2) +
- #   geom_hline(yintercept = hock_height, linetype = "dashed", color = "blue") +
     geom_vline(xintercept = c(-l, l), linetype = "dotted") +
     coord_equal() +
     theme_minimal() +
@@ -69,7 +54,7 @@ plot_udder_arch <- function(a, d, s, l,  n_points = 300) {
 }
 
 main <- function() {
-  a_param <- 10
+  a_param <- 14
   d_param <- 14
   s_param <- 3
   l_param <- 2
