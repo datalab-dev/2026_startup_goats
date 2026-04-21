@@ -40,6 +40,7 @@ pelvic_arch_visualization <- function(l) {
     geom_line()
 }
 
+# only run this when the script is ran directly
 if(sys.nframe() == 0) {
   # setting l to the initial value of 4.6 as specified by the desmos visulalization
   pelvic_arch_visualization(4.6)
