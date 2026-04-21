@@ -1,5 +1,6 @@
 library(ggplot2)
 
+
 # source all of the parts of the goat
 source('R/leg_curve.R')
 source('R/pelvic_curve.R')
@@ -15,7 +16,7 @@ view_bottom  <- -20
 
 
 # these params come from the desmos reference
-l_param = 4.6
+l_param = 4.3
 r_param = 18.0
 
 d_param = 2.0

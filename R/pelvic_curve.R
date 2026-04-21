@@ -28,6 +28,22 @@ pelvic_arch_df <- function(l) {
   
   pelvic_arch <- rbind(left_arch, right_arch)
 }
+ 
+ # Closed polygon for the region above the pelvic arch, capped at top_y.
+ pelvic_polygon_df <- function(l, top_y, n_points = 200) {
+   x_left  <- seq(-l, 0, length.out = n_points)
+   y_left  <- -0.03 * x_left  * (x_left  + 5)
+ 
+   x_right <- seq(0, l, length.out = n_points)
+   y_right <- -0.03 * x_right * (x_right - 5)
+ 
+   data.frame(
+     x = c(x_left, x_right, l, -l),
+     y = c(y_left, y_right, top_y, top_y),
+     group = "pelvic"
+   )
+ }
+ 
 
 # drawing the pelvic arch
 pelvic_arch_visualization <- function(l) {
