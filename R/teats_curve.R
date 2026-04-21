@@ -54,5 +54,5 @@ teat_model = function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 200
     theme_minimal()
 }
 
-source("R/teats_curve.R")
+
 
