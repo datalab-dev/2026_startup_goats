@@ -11,24 +11,23 @@
 # a = udder arch (roundness)
 # s = udder arch (attachment shape)
 
-#
-# a_param / a - arch drop
-#d_param / d -  arch height
-#s_param / s  -  attachment shape (must be > l if using this curve type)
-#l_param / l- half width
-#hock_param - reference line
+# a_param / a - arch roundness
+# d_param / d -  arch height
+# s_param / s  -  udder arch shape (must be > l if using this curve type)
+# l_param / l- inner leg part where it stops
+# pelvic arch - blue point representing the origin 
 
 library(ggplot2)
 
 # Left side
-generate_left_arch <- function(a, d, s, l, n_points = 300) {
+generate_left_arch <- function(a, d, s, l, n_points = 300) { # generate the x point
   x <- seq(-l, 0, length.out = n_points)
   
   if (any(x + s <= 0)) {
-    stop("Need x + s > 0. Make sure s > l.")
+    stop("Need x + s > 0. Make sure s > l.") # makes sure it doesnt go into the legs
   }
   
-  y <- -a * (x + s)^(-1/2) + d
+  y <- -a * (x + s)^(-1/2) + d # applies the equation.
   data.frame(x = x, y = y, side = "left")
 }
 
@@ -52,12 +51,12 @@ generate_udder_arch <- function(a, d, s, l, n_points = 300) {
 }
 
 # Plot
-plot_udder_arch <- function(a, d, s, l, hock_height = 0, n_points = 300) {
+plot_udder_arch <- function(a, d, s, l,  n_points = 300) {
   arch_df <- generate_udder_arch(a, d, s, l, n_points)
   
   ggplot(arch_df, aes(x = x, y = y)) +
     geom_line(color = "black", linewidth = 1.2) +
-    geom_hline(yintercept = hock_height, linetype = "dashed", color = "blue") +
+ #   geom_hline(yintercept = hock_height, linetype = "dashed", color = "blue") +
     geom_vline(xintercept = c(-l, l), linetype = "dotted") +
     coord_equal() +
     theme_minimal() +
@@ -69,22 +68,16 @@ plot_udder_arch <- function(a, d, s, l, hock_height = 0, n_points = 300) {
     )
 }
 
-# Parameters
-a_param <- 17
-d_param <- 10
-s_param <- 3
-l_param <- 2 # leg parameter 
-hock_param <- 0
+main <- function() {
+  a_param <- 10
+  d_param <- 14
+  s_param <- 3
+  l_param <- 2
+  
+  p <- plot_udder_arch(a_param, d_param, s_param, l_param)
+  print(p)
+}
 
-
-
-# Create plot
-p <- plot_udder_arch(
-  a = a_param,
-  d = d_param,
-  s = s_param,
-  l = l_param,
-  hock_height = hock_param
-)
-
-print(p)
+if (sys.nframe() == 0) {
+  main()
+}
