@@ -26,10 +26,8 @@ pelvic_arch_df <- function(l) {
   right_arch_eq = -0.03 * r_x * (r_x - 5)
   right_arch = data.frame(x = r_x, y = right_arch_eq)
   
-  
-  pelvic_arch <- rbind(right_arch, left_arch)
+  pelvic_arch <- rbind(left_arch, right_arch)
 }
-
 
 # drawing the pelvic arch
 pelvic_arch_visualization <- function(l) {
