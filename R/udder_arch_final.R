@@ -33,12 +33,6 @@ generate_arch <- function(a, d, s, l, n_points = 300) {
   data.frame(x = x, y = y, side = side)
 }
 
-# Parameters
-a_param <- 14
-d_param <- 14 # height
-s_param <- 3
-l_param <- 2 # leg parameter 
-
 generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
   
   left_df  <- generate_left_arch(a, d, s, l, n_points)
