@@ -49,7 +49,7 @@ generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
 }
 
 main <- function() {
-  a_param <- 14
+  a_param <- 16
   d_param <- 14
   s_param <- 3
   l_param <- 2
