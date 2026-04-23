@@ -28,9 +28,7 @@ generate_arch <- function(a, d, s, l, n_points = 300) {
   
   y <- -a * (s - abs(x))^(-1/2) + d
   
-  side <- ifelse(x < 0, "left", "right")
-  
-  data.frame(x = x, y = y, side = side)
+  data.frame(x = x, y = y)
 }
 
 generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
@@ -51,7 +49,7 @@ generate_and_plot_udder_arch <- function(a, d, s, l, n_points = 300) {
 }
 
 main <- function() {
-  a_param <- 16
+  a_param <- 14
   d_param <- 14
   s_param <- 3
   l_param <- 2
