@@ -63,6 +63,36 @@ generate_right_curve <- function(o, p, q, l, n_points = 200) {
   data.frame(x = x, y = y)
 }
 
+# Combined points for both halves
+medial_df <- function(o, p, q, l, n_points = 200) {
+  rbind(
+    generate_left_curve(o, p, q, l, n_points),
+    generate_right_curve(o, p, q, l, n_points)
+  )
+}
+
+
+# Closed polygon for the full udder body, composed from the medial
+# curves in this file and the udder arch (generate_arch) in
+# udder_curve.R. The polygon is traversed bottom left -> bottom right
+# via the medial curves, then top right -> top left via the reversed
+# udder arch. Requires udder_curve.R to be sourced before this runs.
+body_polygon_df <- function(med_o, med_p, med_q,
+                            arch_a, arch_d, arch_s,
+                            l, n_points = 200) {
+  left  <- generate_left_curve(med_o, med_p, med_q, l, n_points)
+  right <- generate_right_curve(med_o, med_p, med_q, l, n_points)
+  arch  <- generate_arch(arch_a, arch_d, arch_s, l, n_points)
+
+  arch_rev <- arch[nrow(arch):1, ]
+
+  data.frame(
+    x = c(left$x, right$x, arch_rev$x),
+    y = c(left$y, right$y, arch_rev$y),
+    group = "body"
+  )
+}
+
 
 # --- Scoring functions ---
 

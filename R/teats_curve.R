@@ -53,6 +53,3 @@ teat_model = function(j, q, o, u, h, l, teat_length_score = NULL, n_points = 200
     coord_fixed(xlim = c(-20, 20), ylim = c(-30, 10)) +
     theme_minimal()
 }
-
-
-
