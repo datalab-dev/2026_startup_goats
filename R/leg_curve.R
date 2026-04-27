@@ -35,13 +35,13 @@ library(ggplot2)
 #####
 
 # --- variables where l is width between legs and r is hock (rear knee) height ---
-l <- 2
-r <- 0
+leg_gap_width <- 2
+hock_height <- 0
 
 # --- knee midline lines ---
 df_segments <- data.frame(
-  x    = c(l, -(l+2)),
-  xend = c(l+2, -l),
+  x    = c(leg_gap_width, -(leg_gap_width+2)),
+  xend = c(leg_gap_width+2, -leg_gap_width),
   y    = c(-r, -r),
   yend = c(-r, -r)
 )
@@ -51,12 +51,12 @@ df_segments <- data.frame(
 theta <- seq(0, 2*pi, length.out = 300)
 
 circle_right <- data.frame(
-  x = (l+1) + 0.75 * cos(theta),
+  x = (leg_gap_width+1) + 0.75 * cos(theta),
   y = -r + 0.75 * sin(theta)
 )
 
 circle_left <- data.frame(
-  x = -(l+1) + 0.75 * cos(theta),
+  x = -(leg_gap_width+1) + 0.75 * cos(theta),
   y = -r + 0.75 * sin(theta)
 )
 
@@ -66,8 +66,8 @@ circle_left <- data.frame(
 leg_height <- 20
 
 df_legs <- data.frame(
-  x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-  xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+  x = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
+  xend = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
   y = -r - leg_height/2,
   yend = -r + leg_height/2
 )
@@ -91,18 +91,18 @@ ggplot() +
 ##############
 
 #first try __________________________________________
-#hockmidline <- function(r, l) {
+#hockmidline <- function(r, leg_gap_width) {
   #df_segments <- data.frame(
-   # x    = c(l, -(l+2)),
-   # xend = c(l+2, -l),
+   # x    = c(leg_gap_width, -(leg_gap_width+2)),
+   # xend = c(leg_gap_width+2, -leg_gap_width),
    # y    = c(-r, -r),
    # yend = c(-r, -r))}
 
 
-hockmidline <- function(r, l) {
+hockmidline <- function(r, leg_gap_width) {
   df_segments <- data.frame(
-    x    = c(l, -(l+2)),
-    xend = c(l+2, -l),
+    x    = c(leg_gap_width, -(leg_gap_width+2)),
+    xend = c(leg_gap_width+2, -leg_gap_width),
     y    = c(-r, -r),
     yend = c(-r, -r)
   )
@@ -110,44 +110,44 @@ hockmidline <- function(r, l) {
 }
 
 #first try __________________________________________
-#hocks <- function(r, l) {
+#hocks <- function(r, leg_gap_width) {
   #theta <- seq(0, 2*pi, length.out = 300)
   
  # circle_right <- data.frame(
-  #  x = (l+1) + 0.75 * cos(theta),
+  #  x = (leg_gap_width+1) + 0.75 * cos(theta),
    # y = -r + 0.75 * sin(theta))
   
   #circle_left <- data.frame(
-   # x = -(l+1) + 0.75 * cos(theta),
+   # x = -(leg_gap_width+1) + 0.75 * cos(theta),
   #  y = -r + 0.75 * sin(theta))}
 
-hocks <- function(r, l) {
+hocks <- function(r, leg_gap_width) {
   theta <- seq(0, 2*pi, length.out = 300)
   
   circle_right <- data.frame(
-    x = (l+1) + 0.75 * cos(theta),
+    x = (leg_gap_width+1) + 0.75 * cos(theta),
     y = -r + 0.75 * sin(theta),
     side = "right")
   
   circle_left <- data.frame(
-    x = -(l+1) + 0.75 * cos(theta),
+    x = -(leg_gap_width+1) + 0.75 * cos(theta),
     y = -r + 0.75 * sin(theta),
     side = "left")
   
   return(rbind(circle_right, circle_left))}
 
 #first try ___________________________________________
-#legs <- function(r, l, leg_height) {
+#legs <- function(r, leg_gap_width, leg_height) {
 #  df_legs <- data.frame(
-#    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-#    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+#    x = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
+#    xend = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
 #    y = -r - leg_height/2,
 #    yend = -r + leg_height/2)}
 
-legs <- function(r, l, leg_height) {
+legs <- function(r, leg_gap_width, leg_height) {
   df_legs <- data.frame(
-    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
+    x = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
+    xend = c((leg_gap_width+1)-0.75, (leg_gap_width+1)+0.75, -(leg_gap_width+1)-0.75, -(leg_gap_width+1)+0.75),
     y = -r - leg_height/2,
     yend = -r + leg_height/2
   )
@@ -161,8 +161,8 @@ legs <- function(r, l, leg_height) {
 ####################
 
 
-full_legs <- function(r, l, leg_height) {
+full_legs <- function(r, leg_gap_width, leg_height) {
   list(
-    midline = hockmidline(r, l),
-    legs    = legs(r, l, leg_height),
-    hocks   = hocks(r, l))}
+    midline = hockmidline(r, leg_gap_width),
+    legs    = legs(r, leg_gap_width, leg_height),
+    hocks   = hocks(r, leg_gap_width))}
