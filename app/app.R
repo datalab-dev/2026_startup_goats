@@ -1,6 +1,5 @@
 library(ggplot2)
 
-
 # source all of the parts of the goat
 source('R/leg_curve.R')
 source('R/pelvic_curve.R')
@@ -8,39 +7,46 @@ source('R/medial_curve.R')
 source('R/teats_curve.R')
 source('R/udder_curve.R')
 
-
 # shared boundaries matching the desmos reference
-leg_width    <- 2
-view_top     <- 3
-view_bottom  <- -20
-
+leg_width <- 2
+view_top <- 3
+view_bottom <- -20
 
 # these params come from the desmos reference
-l_param = 4.3
-r_param = 18.0
+# legs
+leg_width <- 4.3
+hock_height <- 18.0
 
-d_param = 2.0
-a_param = 8.7
-s_param = 6.0
+# udder arch
+udder_arch_height <- 2.0
+udder_arch_roundness <- 8.7
+attachment_shape <- 6.0
 
-o_param = 13.0
-p_param = 1.0
-q_param = 0.15
+# medial
+udder_floor_height <- 13.0
+closeness_of_halves <- 1.0
+depth_of_medial <- 0.15
 
-j_param = 2.5
-u_param = 2
-h_param = 4.5
+# teats
+teat_placement <- 2.5
+teat_length <- 2
+teat_diameter <- 4.5
 
 # define the polygons for each part of the goat
-teats_poly  <- teats_polygon_df(j = j_param, q = q_param, o = o_param, u = u_param, h = h_param,
-                                o_body = o_param, p = p_param, q_body = q_param,
-                                l_body = l_param)
-legs_poly   <- legs_polygon_df(l = l_param, w = leg_width,
+teats_poly  <- teats_polygon_df(j = teat_placement, q = depth_of_medial, o = udder_floor_height,
+                                u = teat_length, h = teat_diameter,
+                                o_body = udder_floor_height, p = closeness_of_halves, q_body = depth_of_medial,
+                                l_body = width_between_legs)
+legs_poly   <- legs_polygon_df(l = width_between_legs, w = leg_width,
                                top_y = view_top, bot_y = view_bottom)
-pelvic_poly <- pelvic_polygon_df(l = l_param, top_y = view_top)
-body_poly   <- body_polygon_df(med_o = o_param, med_p = p_param, med_q = q_param,
-                               arch_a = a_param, arch_d = d_param, arch_s = s_param,
-                               l = l_param)
+pelvic_poly <- pelvic_polygon_df(l = width_between_legs, top_y = view_top)
+body_poly   <- body_polygon_df(udder_floor_height = udder_floor_height,
+                               closeness_of_halves = closeness_of_halves,
+                               depth_of_medial = depth_of_medial,
+                               arch_a = udder_arch_roundness,
+                               arch_d = udder_arch_height,
+                               arch_s = attachment_shape,
+                               leg_width = width_between_legs)
 
 ggplot() +
   geom_polygon(data = teats_poly,
@@ -64,5 +70,5 @@ ggplot() +
   theme_minimal() +
   labs(title = "Combined Goat Curves",
        x = "Horizontal position",
-       y = "Vertical position") + 
-  geom_point(aes(x = 0, y = 0), color = "steelblue", size = 5) # pelvic arch point  
+       y = "Vertical position") +
+  geom_point(aes(x = 0, y = 0), color = "steelblue", size = 5) # pelvic arch point
