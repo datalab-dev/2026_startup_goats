@@ -161,17 +161,24 @@ legs <- function(hock_height, width_between_legs, leg_height) {
 ####################
 
 
-full_legs <- function(hock_height =18, width_between_legs = 4.6, leg_height = 20) {
+full_legs <- function(hock_height = 18, width_between_legs = 4.6, leg_height = 20) {
+#^ set defaults right away (they are from the desmos calculator - average/expected values?)
+  
+  # check variable input is appropriate
+  if (!is.numeric(width_between_legs) || 
+      !is.numeric(hock_height) || 
+      !is.numeric(leg_height)) {
+    stop("Input must be numeric")}
+  
+  # return list of other functions
   list(
     midline = hockmidline(hock_height, width_between_legs),
     legs    = legs(hock_height, width_between_legs, leg_height),
-    hocks   = hocks(hock_height, width_between_legs))
-  
-    # type check of input variables, should be an int/double
-    if (!is.numeric(width_between_legs) | !is.numeric(hock_height) | !is.numeric(leg_height)) {
-      stop("Input must be numeric")}}
+    hocks   = hocks(hock_height, width_between_legs))}
 
+
+#"sourcing guard" as per Rash
 if(sys.nframe() == 0) {
-  ()
+  full_legs()
 }
 
