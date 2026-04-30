@@ -35,15 +35,15 @@ library(ggplot2)
 #####
 
 # --- variables where l is width between legs and r is hock (rear knee) height ---
-l <- 2
-r <- 0
+width_between_legs <- 2
+hock_height <- 0
 
 # --- knee midline lines ---
 df_segments <- data.frame(
-  x    = c(l, -(l+2)),
-  xend = c(l+2, -l),
-  y    = c(-r, -r),
-  yend = c(-r, -r)
+  x    = c(width_between_legs, -(width_between_legs+2)),
+  xend = c(width_between_legs+2, -width_between_legs),
+  y    = c(-hock_height, -hock_height),
+  yend = c(-hock_height, -hock_height)
 )
 
 
@@ -51,13 +51,13 @@ df_segments <- data.frame(
 theta <- seq(0, 2*pi, length.out = 300)
 
 circle_right <- data.frame(
-  x = (l+1) + 0.75 * cos(theta),
-  y = -r + 0.75 * sin(theta)
+  x = (width_between_legs+1) + 0.75 * cos(theta),
+  y = -hock_height + 0.75 * sin(theta)
 )
 
 circle_left <- data.frame(
-  x = -(l+1) + 0.75 * cos(theta),
-  y = -r + 0.75 * sin(theta)
+  x = -(width_between_legs+1) + 0.75 * cos(theta),
+  y = -hock_height + 0.75 * sin(theta)
 )
 
 
@@ -66,10 +66,10 @@ circle_left <- data.frame(
 leg_height <- 20
 
 df_legs <- data.frame(
-  x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-  xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-  y = -r - leg_height/2,
-  yend = -r + leg_height/2
+  x = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+  xend = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+  y = -hock_height - leg_height/2,
+  yend = -hock_height + leg_height/2
 )
 
 
@@ -91,65 +91,65 @@ ggplot() +
 ##############
 
 #first try __________________________________________
-#hockmidline <- function(r, l) {
+#hockmidline <- function(hock_height, width_between_legs) {
   #df_segments <- data.frame(
-   # x    = c(l, -(l+2)),
-   # xend = c(l+2, -l),
-   # y    = c(-r, -r),
-   # yend = c(-r, -r))}
+   # x    = c(width_between_legs, -(width_between_legs+2)),
+   # xend = c(width_between_legs+2, -width_between_legs),
+   # y    = c(-hock_height, -hock_height),
+   # yend = c(-hock_height, -hock_height))}
 
 
-hockmidline <- function(r, l) {
+hockmidline <- function(hock_height, width_between_legs) {
   df_segments <- data.frame(
-    x    = c(l, -(l+2)),
-    xend = c(l+2, -l),
-    y    = c(-r, -r),
-    yend = c(-r, -r)
+    x    = c(width_between_legs, -(width_between_legs+2)),
+    xend = c(width_between_legs+2, -width_between_legs),
+    y    = c(-hock_height, -hock_height),
+    yend = c(-hock_height, -hock_height)
   )
   return(df_segments)
 }
 
 #first try __________________________________________
-#hocks <- function(r, l) {
+#hocks <- function(hock_height, width_between_legs) {
   #theta <- seq(0, 2*pi, length.out = 300)
   
  # circle_right <- data.frame(
-  #  x = (l+1) + 0.75 * cos(theta),
-   # y = -r + 0.75 * sin(theta))
+  #  x = (width_between_legs+1) + 0.75 * cos(theta),
+   # y = -hock_height + 0.75 * sin(theta))
   
   #circle_left <- data.frame(
-   # x = -(l+1) + 0.75 * cos(theta),
-  #  y = -r + 0.75 * sin(theta))}
+   # x = -(width_between_legs+1) + 0.75 * cos(theta),
+  #  y = -hock_height + 0.75 * sin(theta))}
 
-hocks <- function(r, l) {
+hocks <- function(hock_height, width_between_legs) {
   theta <- seq(0, 2*pi, length.out = 300)
   
   circle_right <- data.frame(
-    x = (l+1) + 0.75 * cos(theta),
-    y = -r + 0.75 * sin(theta),
+    x = (width_between_legs+1) + 0.75 * cos(theta),
+    y = -hock_height + 0.75 * sin(theta),
     side = "right")
   
   circle_left <- data.frame(
-    x = -(l+1) + 0.75 * cos(theta),
-    y = -r + 0.75 * sin(theta),
+    x = -(width_between_legs+1) + 0.75 * cos(theta),
+    y = -hock_height + 0.75 * sin(theta),
     side = "left")
   
   return(rbind(circle_right, circle_left))}
 
 #first try ___________________________________________
-#legs <- function(r, l, leg_height) {
+#legs <- function(hock_height, width_between_legs, leg_height) {
 #  df_legs <- data.frame(
-#    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-#    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-#    y = -r - leg_height/2,
-#    yend = -r + leg_height/2)}
+#    x = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+#    xend = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+#    y = -hock_height - leg_height/2,
+#    yend = -hock_height + leg_height/2)}
 
-legs <- function(r, l, leg_height) {
+legs <- function(hock_height, width_between_legs, leg_height) {
   df_legs <- data.frame(
-    x = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-    xend = c((l+1)-0.75, (l+1)+0.75, -(l+1)-0.75, -(l+1)+0.75),
-    y = -r - leg_height/2,
-    yend = -r + leg_height/2
+    x = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+    xend = c((width_between_legs+1)-0.75, (width_between_legs+1)+0.75, -(width_between_legs+1)-0.75, -(width_between_legs+1)+0.75),
+    y = -hock_height - leg_height/2,
+    yend = -hock_height + leg_height/2
   )
   return(df_legs)}
 
@@ -161,8 +161,24 @@ legs <- function(r, l, leg_height) {
 ####################
 
 
-full_legs <- function(r, l, leg_height) {
+full_legs <- function(hock_height = 18, width_between_legs = 4.6, leg_height = 20) {
+#^ set defaults right away (they are from the desmos calculator - average/expected values?)
+  
+  # check variable input is appropriate
+  if (!is.numeric(width_between_legs) || 
+      !is.numeric(hock_height) || 
+      !is.numeric(leg_height)) {
+    stop("Input must be numeric")}
+  
+  # return list of other functions
   list(
-    midline = hockmidline(r, l),
-    legs    = legs(r, l, leg_height),
-    hocks   = hocks(r, l))}
+    midline = hockmidline(hock_height, width_between_legs),
+    legs    = legs(hock_height, width_between_legs, leg_height),
+    hocks   = hocks(hock_height, width_between_legs))}
+
+
+#"sourcing guard" as per Rash
+if(sys.nframe() == 0) {
+  full_legs()
+}
+
