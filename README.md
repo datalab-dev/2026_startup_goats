@@ -1,17 +1,22 @@
-# 2026 Smith Goats Project
+# GENERAL INFORMATION
 
 *This is a live document, and will be subject to change as the project progresses*
 
-_Principal Investigator: Fauna Smith_
-_Goat Barn Staff: Ben Rupchist, Nora Manring_  
-_Project Lead: Colton Baumler_
+## Project Title: 2026 Smith Goat Project 
+
+## About:
+
+This project is an app designed to help improve the accuracy and consistency of dairy goat scoring by giving appraisers a way to check their evaluations. It takes linear appraisal scores and generates a visual model of the goat based on those scores. Using the American Dairy Goat Association (ADGA) system, where appraisers score individual physical traits, the app creates an image that can be compared to the real animal to help verify scoring and reduce variation between evaluators.
+
+## Principal Investigator: 
+### Fauna Smith, Assistant Professor, flsmith@ucdavis.edu 
+
+## Contributers: 
+### Ben Rupchist,
+### Nora Manring,   
+Project Lead: Colton Baumler_
 _Data Lab Consultant: Nick Ulle_
-_Collaborators: Camila Chicatto, Hilary Choi, Justin Huang, Rashmit Shrestha, Odelyn Xie_
-
-# Description
-This GitHub repository contains code for Fauna Smith’s Goat Appraisal Visualization Interface project. The project started with mathematical equations that were previously used to aid the appraising process by creating a visualization of a goat rear, including the legs and mammary system, on the online graphing calculator Desmos. We have since translated the equations into R ggplot code, and are in progress of creating a UI system for it.
-
-This project’s end goal is an interface in which appraisers can input the linear appraisal values to create a visualization of the rearview of the goat. The purpose of our collaboration will be to improve appraisal accuracy through creating a program for appraisers to use on iPads when working with the goats. The purpose of this tool is to help support training and improve score accuracy by providing instantaneous feedback for new or existing appraisers. 
+_Collaborators: Camila Chicatto, Hilary Choi, Justin Huang, Rashmit Shrestha, Odelyn Xie_ 
 
 # Links:
 [google]: https://drive.google.com/drive/folders/1k2zZalMFZtyAQk7a1ZUKVJFEten8hQ5k?usp=sharing
