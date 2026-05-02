@@ -1,4 +1,4 @@
-## Loading Some Data to Use/ Cleaning just for me. 
+## Loading Some Data to Use/ Cleaning just for Del.
 
 goats = read.csv("data/goats-la-data-cleaned.csv")
 
