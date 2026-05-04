@@ -12,30 +12,52 @@ This project is an app designed to help improve the accuracy and consistency of 
 ### Fauna Smith, Assistant Professor, flsmith@ucdavis.edu 
 
 ## Contributers: 
-### Ben Rupchist,
-### Nora Manring,   
-Project Lead: Colton Baumler_
-_Data Lab Consultant: Nick Ulle_
-_Collaborators: Camila Chicatto, Hilary Choi, Justin Huang, Rashmit Shrestha, Odelyn Xie_ 
+### Ben Rupchist, Manager at Goat Teaching & Research Facility, barupchis@ucdavis.edu
+### Nora Manring, Student Assistant at Goat Teaching & Research Facility,    
 
-# Links:
+## Project Lead:
+### Colton Baumler, Researcher PHD Candidate, ccbaumler@ucdavis.edu
+
+## Data Lab Consultant:
+### Nick Ulle, Senior Statistician, naulle@ucdavis.edu
+
+## Contributers:
+### Camila Chicatto, Undergraduate Student, cchicatto@ucdavis.edu
+###  Hilary Choi, Undergraduate Student, hfchoi@ucdavis.edu
+###  Justin Huang, Undergraduate Student, jjhhwang@ucdavis.edu
+###  Rashmit Shrestha, Undergraduate Student, rlshrestha@ucdavis.edu
+###  Odelyn Xie, Undergraduate Student, delxie@ucdavis.edu 
+
+## Workflow Diagram: 
+<insert when done>
+
+# SHARING/ACCESS INFORMATION 
+
+## Liscense: 
+
+# DATA & REPOSITORY STRUCTURE 
+
+##  INSTALLATIONS
+For the coding portion of this project, the following packages will need to be loaded in R:   
+- Tidyverse package
+- Shiny UI  package
+
+## Links:
 [google]: https://drive.google.com/drive/folders/1k2zZalMFZtyAQk7a1ZUKVJFEten8hQ5k?usp=sharing
 
 ## Google Drive and Directory Structure
 
 ```
-data/                                           Data sets
-└── Goat Pictures/                    Images of dairy goats taken from rear 
+data/                            Data sets
+└── Goat Pictures/            Images of dairy goats taken from rear 
 └── rear udder image library/    Images of miniature goats taken from rear 
-scoping documentation/              Supporting documents
-2025Linear-SOPDraft1.pdf 	    Collection of data documentation for ADGA’s Linear Appraisal   
-                                                    Program
-Data Inventory			    Dataset overview of GOAT data 
-GOAT Readme.md                     Brief overview of the project
-Linear 2025 pptx.                       Visualizations about goats appraised in 2025
-Meeting Notes			    Meeting notes from meeting with Project Lead and Principal    
-                                                   Investigator
-Student Meeting Notes 	    Notes taken during student team meetings
+scoping documentation/           Supporting documents
+2025Linear-SOPDraft1.pdf 	 Collection of data documentation for ADGA’s Linear Appraisal Program
+Data Inventory			 Dataset overview of GOAT data 
+GOAT Readme.md                   Brief overview of the project
+Linear 2025 pptx.                Visualizations about goats appraised in 2025
+Meeting Notes			 Meeting notes from meeting with Project Lead and Principal Investigator
+Student Meeting Notes 	         Notes taken during student team meetings
 ```
 
 ## Github File and Directory Structure
@@ -56,14 +78,6 @@ R/              R source code
 LICENSE         License for the project
 README.md       This file
 ```
-
-## Installation
-For the coding portion of this project, the following packages will need to be loaded in R:
-- Tidyverse package 
-- Shiny package
-
-## Contributing
-_Colton Baumler, Camila Chicatto, Hilary Choi, Justin Huang, Nora Manring, Ben Rupchis, Rashmit Shrestha, Fauna Smith, Nick Ulle, Odelyn Xie_
 
 ([back to top][top])
 
