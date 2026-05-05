@@ -1,3 +1,4 @@
+library(magick)
 library(ggplot2)
 
 source('R/udder_curve.R')
@@ -29,6 +30,7 @@ teat_length <- 3
 teat_diameter <- 4.5
 teat_roundness <- depth_of_medial
 
+# polygons for graphing
 teats_poly <- teats_polygon_df(
   teat_placement      = teat_placement,
   teat_roundness      = teat_roundness,
@@ -62,7 +64,29 @@ body_poly <- body_polygon_df(
   leg_width = leg_width
 )
 
+# parameters to change to adjust the image size, location, and rotation
+# positive value zooms in, negative zooms out
+zoom = 1.5
+# positive value shifts up, negative shifts down
+shift_x = -0.5
+# positive value shifts left, negative shifts right
+shift_y = -0.5
+# positive value rotates clockwise, negative rotates counter-clockwise
+roataion = 0
+
+# sample image for overlay, not reflexive of the curves
+goat <- image_read("images/325RU.HEIC") |>
+  image_colorize(opacity = 30, color = "white") |>
+  image_rotate(roataion) |>
+  as.raster()
+
+# rear view of goat mammary system
 ggplot() +
+  annotation_raster(goat,
+                    xmin = (-8 - zoom) + shift_x,
+                    xmax = (8 + zoom) + shift_x, 
+                    ymin = (view_bottom - zoom) + shift_y, 
+                    ymax = (view_top + zoom) + shift_y) +
   geom_polygon(data = teats_poly,
                aes(x = x, y = y, group = group),
                fill = "mediumpurple", color = "mediumpurple3",
@@ -74,14 +98,14 @@ ggplot() +
   geom_polygon(data = body_poly,
                aes(x = x, y = y, group = group),
                fill = "salmon", color = "firebrick",
-               linewidth = 1, alpha = 1.0) +
+               linewidth = 1, alpha = 0.5) +
   geom_polygon(data = legs_poly,
                aes(x = x, y = y, group = group),
                fill = "gray60", color = "black",
                linetype = "solid", linewidth = 0.4, alpha = 0.5) +
   coord_fixed(xlim = c(-8, 8), ylim = c(view_bottom, view_top), expand = FALSE) +
   theme_minimal() +
-  labs(title = "Combined Goat Curves",
+  labs(title = "Posterior View of Goat Mammary\nSystem",
        x = "Horizontal position",
        y = "Vertical position") +
   geom_point(aes(x = 0, y = 0), color = "steelblue", size = 5)
