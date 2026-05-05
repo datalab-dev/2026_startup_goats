@@ -33,7 +33,7 @@ This project is an app designed to help improve the accuracy and consistency of 
 
 # SHARING/ACCESS INFORMATION 
 
-## Liscense: 
+## Liscense: AGPLv3 License 
 
 # DATA & REPOSITORY STRUCTURE 
 
