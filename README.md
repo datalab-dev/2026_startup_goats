@@ -84,6 +84,11 @@ This helps users:
 
 *(To be added)*
 
+### Prototype / UI Planning
+
+An early-stage prototype and UI planning materials can be found here:
+
+[Figma Prototype / UI Planning](https://www.figma.com/design/ZpYCIH0f4AM39gjHRu5UR9/Ag-GOAT-UI?node-id=0-1&t=DCFXNh8wzVOKQWI8-1)
 
 
 ## SHARING/ACCESS INFORMATION 
@@ -97,19 +102,14 @@ This project is developed in R and uses a Shiny-based interface.
 
 Required packages:
 
-install.packages(c("tidyverse", "shiny"))
-
-## Links: 
-
-Project data and reference materials are stored in a shared Google Drive:
-
-Google Drive:
-https://drive.google.com/drive/folders/1k2zZalMFZtyAQk7a1ZUKVJFEten8hQ5k?usp=sharing
+`install.packages(c("tidyverse", "shiny", "magick"))`
 
 
 ## Data Organisation
 
 ### Google Drive Structure
+[Google Drive]
+(https://drive.google.com/drive/folders/1k2zZalMFZtyAQk7a1ZUKVJFEten8hQ5k?usp=sharing)
 
 ```
 data/                         
@@ -126,28 +126,30 @@ Data Inventory                                     Metadata table describing dat
 GOAT Readme.md                                     Overview of the project and objectives  
 Linear 2025.pptx                                   Data analysis and visualizations of 2025 appraisal scores, including trait distributions and inter-appraiser variability  
 Meeting Notes                                      Notes from meetings with project lead and principal investigators  
-Student Meeting Notes                             Notes from internal student team meetings  
+Student Meeting Notes                              Notes from internal student team meetings  
 ```
 
 ### Github Repository Structure
 ```
-R/                       R source code
-├── data_cleaning.R      Data preprocessing
-├── leg_curve.R          Function: rear leg / hock reference (used for proportional scoring)
-├── pelvic_curve.R       Function: pelvic arch reference (anchor for udder traits)
-├── udder_curve.R        Function: udder shape (height, depth, arch)
-├── medial_curve.R       Function: medial suspensory ligament (udder support)
-├── teats_curve.R        Function: teat placement and length (rear view)
-└── ui_teats.R           Prototype Shiny UI for testing visualization
-data/                    Will contain rear udder reference images for input parameterization
-docs/                    Supporting documents
-├── team_agreement.md    Team workflow guidelines and collaboration expectations
+R/                              R source code
+├── data_cleaning.R             Data preprocessing
+├── leg_curve.R                 Function: rear leg / hock reference (used for proportional scoring)
+├── pelvic_curve.R              Function: pelvic arch reference (anchor for udder traits)
+├── udder_curve.R               Function: udder shape (height, depth, arch)
+├── medial_curve.R              Function: medial suspensory ligament (udder support)
+├── teats_curve.R               Function: teat placement and length (rear view)
+└── ui_teats.R                  Prototype Shiny UI for testing visualization
+data/                           Will contain rear udder reference images for input parameterization
+docs/                           Supporting documents
+├── team_agreement.md           Team workflow guidelines and collaboration expectations
+├── goat_workflow.png           Diagram showing how project scripts and application components connect
+├── goat_timeline_workflow.png  Visual timeline of project development stages and milestones
 └── README_TEATS.md 
 images/
-└── teat_placement.png   ADGA diagram showing teat placement scoring scale
-R/                       R source code
-.gitignore               Paths Git should ignore
-README.md                This file
+└── teat_placement.png          ADGA diagram showing teat placement scoring scale
+R/                              R source code
+.gitignore                      Paths Git should ignore
+README.md                       This file
 ```
 
 ## Contributors
