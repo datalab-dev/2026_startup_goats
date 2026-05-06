@@ -12,8 +12,6 @@ This project is being developed in collaboration with the American Dairy Goat As
 
 ADGA is the primary organization that sets standards and maintains records for dairy goats in the U.S. One of its key programs is the Linear Appraisal System, which evaluates goats based on physical traits.
 
-One of ADGA’s key programs is the Linear Appraisal System, which evaluates goats based on physical traits.
-
 In this system, trained appraisers assess specific parts of a goat’s body (such as udder shape, leg structure, and body capacity) and assign each trait a score on a 1-50 scale.
 
 Each score represents where the animal falls along a range of possible forms for that trait. For example, a low and high score for a trait correspond to different physical structures or positions, rather than “good” or “bad.”
