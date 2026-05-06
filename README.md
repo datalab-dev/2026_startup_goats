@@ -14,7 +14,7 @@ ADGA is the primary organization that sets standards and maintains records for d
 
 One of ADGA’s key programs is the Linear Appraisal System, which evaluates goats based on physical traits.
 
-In this system, trained appraisers assess specific parts of a goat’s body (such as udder shape, leg structure, and body capacity) and assign each trait a score on a 1–50 scale.
+In this system, trained appraisers assess specific parts of a goat’s body (such as udder shape, leg structure, and body capacity) and assign each trait a score on a 1-50 scale.
 
 Each score represents where the animal falls along a range of possible forms for that trait. For example, a low and high score for a trait correspond to different physical structures or positions, rather than “good” or “bad.”
 
@@ -82,11 +82,13 @@ This helps users:
 
 ### Workflow Diagram
 
-*(To be added)*
+![Project Workflow Diagram](docs/goat_workflow.png)
 
 ### Prototype / UI Planning
 
 An early-stage prototype and UI planning materials can be found here:
+
+![Figma Prototype Preview](images/Ag-Goat Figma.png)
 
 [Figma Prototype / UI Planning](https://www.figma.com/design/ZpYCIH0f4AM39gjHRu5UR9/Ag-GOAT-UI?node-id=0-1&t=DCFXNh8wzVOKQWI8-1)
 
@@ -146,6 +148,7 @@ docs/                           Supporting documents
 ├── goat_timeline_workflow.png  Visual timeline of project development stages and milestones
 └── README_TEATS.md 
 images/
+├── Ag-GOAT Figma.png           UI design prototype
 └── teat_placement.png          ADGA diagram showing teat placement scoring scale
 R/                              R source code
 .gitignore                      Paths Git should ignore
