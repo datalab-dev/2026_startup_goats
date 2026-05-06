@@ -88,7 +88,7 @@ This helps users:
 
 An early-stage prototype and UI planning materials can be found here:
 
-![Figma Prototype Preview](images/Ag-Goat Figma.png)
+![Figma Prototype Preview](images/Ag-Goat_Figma.png)
 
 [Figma Prototype / UI Planning](https://www.figma.com/design/ZpYCIH0f4AM39gjHRu5UR9/Ag-GOAT-UI?node-id=0-1&t=DCFXNh8wzVOKQWI8-1)
 
