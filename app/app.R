@@ -1,5 +1,6 @@
 library(magick)
 library(ggplot2)
+library(writexl)
 
 source('R/udder_curve.R')
 source('R/leg_curve.R')
@@ -109,3 +110,23 @@ ggplot() +
        x = "Horizontal position",
        y = "Vertical position") +
   geom_point(aes(x = 0, y = 0), color = "steelblue", size = 5)
+
+# Export data: UdderDepth, Rear Udder Height, Rear Udder Arch, Medial Suspensory Ligament,
+# Teat Placement, Teat Diameter, Teat Length
+### tbds are set to 0 for testing purposes
+# add goat identifiers columns?
+export_df = data.frame(
+  "UdderDepth" = get_udder_depth_score(udder_floor_height, hock_height),
+  "Rear Udder Height" = 0, #tbd
+  "Rear Udder Arch" = 0, #tbd
+  "Medial Suspensory Ligament" = get_medial_score(closeness_of_halves, depth_of_medial),
+  "Teat Placement" = 0, #tbd
+  "Teat Diameter" = 0, #tbd
+  "Teat Length" = 0 #tbd
+)
+names(export_df) = c("UdderDepth","Rear Udder Height","Rear Udder Arch", "Medial Suspensory Ligament",
+                      "Teat Placement", "Teat Diameter", "Teat Length")
+write_xlsx(export_df, "data/goat_traits.xlsx")
+
+
+
