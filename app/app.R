@@ -2,11 +2,11 @@ library(ggplot2)
 
 
 # source all of the parts of the goat
-source('R/leg_curve.R')
-source('R/pelvic_curve.R')
-source('R/medial_curve.R')
-source('R/teats_curve.R')
-source('R/udder_curve.R')
+source('../R/leg_curve.R')
+source('../R/pelvic_curve.R')
+source('../R/medial_curve.R')
+source('../R/teats_curve.R')
+source('../R/udder_curve.R')
 
 
 # shared boundaries matching the desmos reference
