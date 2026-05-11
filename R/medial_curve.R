@@ -104,21 +104,34 @@ body_polygon_df <- function(udder_floor_height, closeness_of_halves, depth_of_me
   )
 }
 
-
 # --- Scoring functions ---
+
+score_to_medial_inches <- function(score, goat_size = "standard") {
+  if (goat_size == "standard") {
+    scales::rescale(score, to = c(-1, 3), from = c(5, 45))
+  } else if (goat_size == "miniature") {
+    scales::rescale(score, to = c(-0.5, 1.5), from = c(5, 45))
+  } else {
+    stop("goat_size must be 'standard' or 'miniature'")
+  }
+}
+
+medial_inches_to_depth <- function(medial_inches, closeness_of_halves = 1) {
+  medial_inches / (closeness_of_halves + 1)^2
+}
 
 get_medial_score <- function(closeness_of_halves = 1, depth_of_medial = 0.15) {
   check_num(closeness_of_halves)
   check_num(depth_of_medial)
-
+  
   cleft_depth <- depth_of_medial * (closeness_of_halves + 1)^2
-
+  
   if (cleft_depth <= 0) {
     score <- max(1, min(5, 5 + cleft_depth * 5))
   } else {
     score <- 15 + cleft_depth * 10
   }
-
+  
   return(max(1, min(50, round(score))))
 }
 
@@ -139,27 +152,40 @@ get_udder_depth_score <- function(udder_floor_height = 13, hock_height = 18) {
   return(max(1, min(50, round(score))))
 }
 
-
 medial_visualization <- function(udder_floor_height = 13, closeness_of_halves = 1,
                                  depth_of_medial = 0.15, leg_width = 4.6,
-                                 hock_height = 18) {
+                                 hock_height = 18,
+                                 medial_score = NULL,
+                                 goat_size = "standard") {
   check_num(udder_floor_height)
   check_num(closeness_of_halves)
   check_num(depth_of_medial)
   check_num(leg_width)
   check_num(hock_height)
-
+  
+  if (!is.null(medial_score)) {
+    medial_inches <- score_to_medial_inches(
+      score = medial_score,
+      goat_size = goat_size
+    )
+    
+    depth_of_medial <- medial_inches_to_depth(
+      medial_inches = medial_inches,
+      closeness_of_halves = closeness_of_halves
+    )
+  }
+  
   df <- medial_df(udder_floor_height, closeness_of_halves,
                   depth_of_medial, leg_width)
-
+  
   ggplot(df) +
     aes(x = x, y = y) +
     geom_point() +
     geom_hline(yintercept = -hock_height, linetype = "dashed", color = "blue")
-
+  
   print("Medial Score:")
   print(get_medial_score(closeness_of_halves, depth_of_medial))
-
+  
   print("Udder Depth Score:")
   print(get_udder_depth_score(udder_floor_height, hock_height))
 }
