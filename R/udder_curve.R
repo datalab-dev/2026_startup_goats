@@ -16,6 +16,18 @@ check_num <- function(x) {
   if (!is.numeric(x)) print("Argument is not numeric")
 }
 
+# scoring functions 
+
+score_to_arch_roundness <- function(score) {
+  scales::rescale(score, to = c(18, 4), from = c(5, 50))
+}
+
+score_to_arch_shape <- function(score, leg_width) {
+  scales::rescale(score, to = c(leg_width + 0.25, leg_width + 4), from = c(5, 50))
+}
+
+# arch generation
+
 generate_arch <- function(arch_roundness, arch_height, arch_shape,
                           leg_width, n_points = 300) {
   check_num(arch_roundness)
