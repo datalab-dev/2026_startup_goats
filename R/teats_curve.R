@@ -18,11 +18,12 @@
 
 library(tidyverse)
 
+# functions that convert scores to inches
 score_to_teat_length <- function(score, goat_size = "standard") {
   if (goat_size == "standard") {
-    scales::rescale(score, to = c(0.5, 5.0), from = c(5, 50))
+    teat_length <- scales::rescale(score, to = c(0.5, 5.0), from = c(5, 50))
   } else if (goat_size == "miniature") {
-    scales::rescale(score, to = c(0.25, 2.5), from = c(5, 50))
+    teat_length <- scales::rescale(score, to = c(0.25, 2.5), from = c(5, 50))
   } else {
     stop("goat_size must be 'standard' or 'miniature'")
   }
@@ -30,12 +31,51 @@ score_to_teat_length <- function(score, goat_size = "standard") {
 
 score_to_teat_diameter <- function(score, goat_size = "standard") {
   if (goat_size == "standard") {
-    scales::rescale(score, to = c(0.5, 2.5), from = c(5, 45))
+    teat_diameter <- scales::rescale(score, to = c(0.5, 2.5), from = c(5, 45))
   } else if (goat_size == "miniature") {
-    scales::rescale(score, to = c(0.25, 1.25), from = c(5, 45))
+    teat_diameter <- scales::rescale(score, to = c(0.25, 1.25), from = c(5, 45))
   } else {
     stop("goat_size must be 'standard' or 'miniature'")
   }
+}
+
+# functions that calculate the scores from the goat dimensions
+get_teat_placement_score <- function(teat_placement = 2.7, leg_width = 4.6) {
+  if (!is.numeric(teat_placement) || !is.numeric(leg_width)) {
+    stop("Input must be numeric")
+  }
+  
+  leg_width <- max(0, min(20, leg_width))
+  teat_placement <- max(0, min(10, teat_placement))
+  
+  score <- ( 1 - (teat_placement ^ 2) / (leg_width - (leg_width / 17.5)) ^ 2) * 50
+  max(1, min(50, round(score)))
+}
+
+get_teat_length_score <- function(teat_placement = 2.7, teat_roundness = 0.15, 
+                                  udder_floor_height = 13,
+                                  teat_length = 1.4, teat_diameter = 3.5,
+                                  closeness_of_halves = 1,
+                                  depth_of_medial = 0.15) {
+  if (!is.numeric(teat_placement) || !is.numeric(teat_roundness) || 
+      !is.numeric(udder_floor_height) || !is.numeric(teat_length) || 
+      !is.numeric(teat_diameter) || !is.numeric(closeness_of_halves) ||
+      !is.numeric(depth_of_medial) ) {
+    stop("Input must be numeric")
+  }
+  
+  teat_input <- -teat_placement - 0.13
+  teat <- teat_diameter * (teat_input  + teat_placement) *
+    (teat_input  + (teat_roundness + teat_placement)) -
+    (udder_floor_height + teat_length)
+  
+  medial_input <- -1 - closeness_of_halves
+  medial <- depth_of_medial * (medial_input + closeness_of_halves) *
+    (medial_input + (closeness_of_halves + 2)) +
+    depth_of_medial - udder_floor_height
+  
+  score <- -10 * (teat - medial)
+  max(1, min(50, round(score)))
 }
 
 teat_model <- function(teat_placement, teat_roundness, udder_floor_height,
@@ -72,6 +112,7 @@ teat_model <- function(teat_placement, teat_roundness, udder_floor_height,
     coord_fixed(xlim = c(-20, 20), ylim = c(-30, 10)) +
     theme_minimal()
 }
+
 # Closed polygon for both teats. The top boundary of each teat polygon follows
 # the medial curve (udder floor) so the teats connect seamlessly to the udder body.
 # The bottom boundary is the teat parabola.
@@ -137,6 +178,6 @@ if (sys.nframe() == 0) {
     udder_floor_height = 13,
     teat_length        = 2,
     teat_diameter      = 4.5,
-    leg_width = 4.3
+    leg_width = 4.6
   )
 }
