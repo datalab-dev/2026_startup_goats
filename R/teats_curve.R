@@ -39,6 +39,13 @@ score_to_teat_diameter <- function(score, goat_size = "standard") {
   }
 }
 
+# not sure if this is biologically/mathematically correct? more testing needed
+score_to_teat_placement <- function(score = 31, leg_width = 4.6) {
+  s <- (50 - score) / 49 # normalizing score
+  
+  teat_placement <- max(0, min(10, 0.94 * leg_width * sqrt(s)))
+}
+
 # functions that calculate the scores from the goat dimensions
 get_teat_placement_score <- function(teat_placement = 2.7, leg_width = 4.6) {
   if (!is.numeric(teat_placement) || !is.numeric(leg_width)) {
@@ -51,6 +58,7 @@ get_teat_placement_score <- function(teat_placement = 2.7, leg_width = 4.6) {
   score <- ( 1 - (teat_placement ^ 2) / (leg_width - (leg_width / 17.5)) ^ 2) * 50
   max(1, min(50, round(score)))
 }
+print(get_teat_placement_score())
 
 get_teat_length_score <- function(teat_placement = 2.7, teat_roundness = 0.15, 
                                   udder_floor_height = 13,
