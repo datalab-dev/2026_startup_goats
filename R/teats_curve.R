@@ -44,6 +44,7 @@ score_to_teat_placement <- function(score = 31, leg_width = 4.6) {
   s <- (50 - score) / 49 # normalizing score
   
   teat_placement <- max(0, min(10, 0.94 * leg_width * sqrt(s)))
+  teat_placement <- round(teat_placement, 1)
 }
 
 # functions that calculate the scores from the goat dimensions
