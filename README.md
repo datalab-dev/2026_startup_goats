@@ -1,33 +1,30 @@
-# Goat Observation Appraisal Tool (GOAT) 🐐
+# Ag-Goat 🐐
 
 *Working Title – Subject to Revision*
 
 *This is a live document, and will be subject to change as the project progresses*
 
-
 ## Background:
-
 
 This project is being developed in collaboration with the American Dairy Goat Association (ADGA) and UC Davis.
 
-ADGA is the primary organization that sets standards and maintains records for dairy goats in the U.S. One of its key programs is the Linear Appraisal System, which evaluates goats based on physical traits.
+The ADGA is the primary organization that sets standards and maintains records for dairy goats in the U.S. One of its key programs is the Linear Appraisal System, which evaluates goats based on physical traits. In this system, trained appraisers evaluate physical traits related to structural durability, mammary function, and dairy characteristics.
 
-In this system, trained appraisers assess specific parts of a goat’s body (such as udder shape, leg structure, and body capacity) and assign each trait a score on a 1-50 scale.
-
-Each score represents where the animal falls along a range of possible forms for that trait. For example, a low and high score for a trait correspond to different physical structures or positions, rather than “good” or “bad.”
-
-This allows goats to be described in a consistent, standardized way across different appraisers.
-The goal is to make evaluations more consistent and useful for:
+These evaluations are used to support:
 
 * breeding decisions
 * herd management
-* research
+* genetic evaluation and research
 
-However, these scores are still just numbers, which can be hard to interpret and compare visually.
+Each trait is scored on a 1 - 50 scale representing a biological range rather than a ranking of “good” or “bad.” For example, a trait score may describe differences in udder height, teat placement, or leg structure. The goal of the system is to create a more standardized and consistent way to describe dairy goat conformation across herds and appraisers.
+
+However, interpreting the relationship between numeric scores and physical form still depends heavily on visual experience and in-person training. Outside formal appraisal sessions, it can be difficult to consistently visualize what different trait scores represent in practice, which can contribute to variation between appraisers.
+
+This project explores whether linear appraisal traits can be translated into a visual rear-view udder model that could support appraisal training, score interpretation, and consistency between appraisers in and outside formal evaluation sessions.
 
 ## Project Focus: 
 
-The goal is to build an application that takes linear appraisal scores for mammary traits and converts them into a visual model of the udder.
+The goal is to build an application that takes linear appraisal scores for mammary traits and converts them into a visual rear-view model of the udder.
 
 This project focuses specifically on the mammary system from the rear view (the udder and teat structures responsible for milk production), a component of dairy goat evaluation.
 
@@ -39,9 +36,10 @@ Key traits include:
 * medial support (udder split)
 * teat placement and length
 
-These traits affect milk production, udder health, and how long a dairy goat can stay productive.
+These traits are associated with milk production, udder durability, and susceptibility to injury or mastitis. For example, excessively deep udders may be more vulnerable to injury and infection due to their proximity to the hocks and ground.
+Because these evaluations are used in breeding and herd management decisions, consistent interpretation of mammary traits is important for assessing long-term productivity and structural soundness in dairy goats.
 
-This focus was chosen because the mammary system is important and can be difficult to evaluate consistently. In practice, appraisers often estimate traits visually, which can lead to variation in scores.
+This project explores whether rear-view visual modeling can help make mammary trait scores easier to interpret and compare across evaluations while supporting appraisal training and scoring consistency outside formal evaluation sessions.
 
 ### Trait Reference (ADGA)
 
@@ -64,37 +62,46 @@ In focusing on the rear view of the udder, this project:
 
 ## How It Works
 
-This project takes linear appraisal scores and converts them into a visual model.
+This project takes linear appraisal scores for mammary traits and converts them into a rear-view visual model of a dairy goat udder.
 
-In simple terms:
+Users input trait values related to:
 
-- input trait scores  
-- convert scores into shape parameters  
-- generate a rear-view model of the udder  
+* udder height and depth
+* udder shape and attachment
+* medial support (udder split)
+* teat placement and teat length
 
-This helps users:
+The system then uses those values to adjust different parts of the udder model and generate a corresponding visualization.
 
-- understand what the scores represent  
-- compare different evaluations  
-- check for consistency in scoring  
+Different anatomical features are built as separate R scripts and combined through a Shiny application workflow. Rear leg and pelvic positioning are also included as reference points to help maintain proportional relationships within the model.
+
+**The current prototype does not yet directly translate official ADGA linear appraisal scores into finalized biological representations.** Instead, the current system is being used to explore how trait-based parameters may be visually modeled and interpreted.
+### Current Prototype Output
+
+The image below shows the current visualization output generated from the Ag-GOAT mammary trait modeling workflow.  
+
+The current prototype allows users to adjust mammary trait parameters and generate a rear-view udder visualization that can be used as a visual reference during development and testing.
+
+
+![Ag-GOAT Week 7 Prototype](images/Ag-GOAT_Week7Progress.png)
 
 ### Workflow Diagram
 
+The diagram below outlines the current development workflow for the project, including the separation of mammary traits into modular R source functions, integration through `app.R`, and planned future development stages.
+
 ![Project Workflow Diagram](docs/goat_workflow.png)
 
-### Prototype / UI Planning
+### Future Development / Conceptual Features
+The designs below represent exploratory interface and visual design concepts for the Ag-GOAT application. They are intended to demonstrate possible layout structure, workflow organization, and visual styling choices for future development.
 
-An early-stage prototype and UI planning materials can be found here:
 
 ![Figma Prototype Preview](images/Ag-GOAT_Figma.png)
 
 [Figma Prototype / UI Planning](https://www.figma.com/design/ZpYCIH0f4AM39gjHRu5UR9/Ag-GOAT-UI?node-id=0-1&t=DCFXNh8wzVOKQWI8-1)
 
-
 ## SHARING/ACCESS INFORMATION 
 
 ### Liscense: AGPLv3 License 
-
 
 ## INSTALLATION
 
@@ -153,6 +160,11 @@ R/                              R source code
 README.md                       This file
 ```
 
+### Supporting Documentation
+
+- [Goat Data Dictionary](docs/goat_data_dictionary.xlsx)  
+  Reference document describing datasets, variables, trait abbreviations, and source information used throughout the project.
+
 ## Contributors
 
 ### Principal Investigators
@@ -198,3 +210,5 @@ rlshrestha@ucdavis.edu
 **Odelyn Xie**  
 Undergraduate Student  
 delxie@ucdavis.edu  
+
+
