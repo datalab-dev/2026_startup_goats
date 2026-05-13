@@ -26,6 +26,10 @@ score_to_arch_shape <- function(score, leg_width) {
   scales::rescale(score, to = c(leg_width + 0.25, leg_width + 4), from = c(5, 50))
 }
 
+score_to_arch_height <- function(score, arch_height) {
+  scales::rescale(score, to = c(arch_height + 0.5), from = c(5, 50))
+}
+
 # arch generation
 
 generate_arch <- function(arch_roundness, arch_height, arch_shape,
@@ -89,6 +93,7 @@ main <- function() {
   arch_height        <- 14
   arch_shape         <- 3
   leg_width <- 2
+  score <- 5
 
   p <- generate_and_plot_udder_arch(arch_roundness, arch_height,
                                     arch_shape, leg_width)
