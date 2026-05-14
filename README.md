@@ -4,11 +4,14 @@
 
 *This is a live document, and will be subject to change as the project progresses*
 
+*This project is intended to support training and continuing education in appraising goat mammary systems. The ADGA linear appraisal system converts visual evaluation into standardized numerical measurements that are associated with ease of milking, udder durability, mastitis resistance, and long-term productivity. Because these scores are used in breeding and herd management decisions, consistent interpretation can affect breeding value estimation and long-term herd improvement.*
+
 ## Background:
 
 This project is being developed in collaboration with the American Dairy Goat Association (ADGA) and UC Davis.
 
-The ADGA is the primary organization that sets standards and maintains records for dairy goats in the U.S. One of its key programs is the Linear Appraisal System, which evaluates goats based on physical traits. In this system, trained appraisers evaluate physical traits related to structural durability, mammary function, and dairy characteristics.
+The ADGA is the primary organization that sets standards and maintains records for dairy goats in the U.S. One of its key programs is the Linear Appraisal System, which evaluates goats based on physical traits. In this system, trained appraisers evaluate physical traits related to mammary function, and dairy characteristics.
+
 
 These evaluations are used to support:
 
@@ -16,11 +19,16 @@ These evaluations are used to support:
 * herd management
 * genetic evaluation and research
 
-Each trait is scored on a 1 - 50 scale representing a biological range rather than a ranking of “good” or “bad.” For example, a trait score may describe differences in udder height, teat placement, or leg structure. The goal of the system is to create a more standardized and consistent way to describe dairy goat conformation across herds and appraisers.
+
+Each trait is scored on a 1 - 50 scale based on observable physical variation. In the ADGA system, these scores are treated as a “linear” description of a trait, meaning they describe a range of biological variation rather than assigning a ranking of good or bad.
+
+> “The term ‘linear’ in a linear appraisal system refers to the fact that traits are rated on a linear scale that goes from one biological extreme for that trait to the other.”
+>
+> — ADGA Linear Appraisal Booklet
+
+For example, a trait score may describe differences in udder height, teat placement, or leg structure. The goal of the system is to create a more standardized and consistent way to describe dairy goat conformation across herds and appraisers.
 
 However, interpreting the relationship between numeric scores and physical form still depends heavily on visual experience and in-person training. Outside formal appraisal sessions, it can be difficult to consistently visualize what different trait scores represent in practice, which can contribute to variation between appraisers.
-
-This project explores whether linear appraisal traits can be translated into a visual rear-view udder model that could support appraisal training, score interpretation, and consistency between appraisers in and outside formal evaluation sessions.
 
 ## Project Focus: 
 
@@ -37,9 +45,10 @@ Key traits include:
 * teat placement and length
 
 These traits are associated with milk production, udder durability, and susceptibility to injury or mastitis. For example, excessively deep udders may be more vulnerable to injury and infection due to their proximity to the hocks and ground.
-Because these evaluations are used in breeding and herd management decisions, consistent interpretation of mammary traits is important for assessing long-term productivity and structural soundness in dairy goats.
 
-This project explores whether rear-view visual modeling can help make mammary trait scores easier to interpret and compare across evaluations while supporting appraisal training and scoring consistency outside formal evaluation sessions.
+Because these evaluations are used in breeding and herd management decisions, consistent interpretation of mammary traits is important for assessing long-term productivity and structural soundness in dairy goats. The scoring of these traits should be an approximate Gaussian distribution that represents the biological range seen across the goat population. In practice, appraisers estimate traits visually, which can lead to variation in scores. Specifically, a distribution that is too tight around the mean and therefore biologically unrepresentative.
+
+This project explores whether linear appraisal traits can be translated into a visual rear-view udder model that could support appraisal training, score interpretation, and consistency between appraisers in and outside formal evaluation sessions.
 
 ### Trait Reference (ADGA)
 
@@ -89,7 +98,7 @@ The current prototype allows users to adjust mammary trait parameters and genera
 
 The diagram below outlines the current development workflow for the project, including the separation of mammary traits into modular R source functions, integration through `app.R`, and planned future development stages.
 
-![Project Workflow Diagram](docs/goat_workflow.png)
+![Project Workflow Diagram](images/goat_workflow.png)
 
 ### Future Development / Conceptual Features
 The designs below represent exploratory interface and visual design concepts for the Ag-GOAT application. They are intended to demonstrate possible layout structure, workflow organization, and visual styling choices for future development.
@@ -99,17 +108,13 @@ The designs below represent exploratory interface and visual design concepts for
 
 [Figma Prototype / UI Planning](https://www.figma.com/design/ZpYCIH0f4AM39gjHRu5UR9/Ag-GOAT-UI?node-id=0-1&t=DCFXNh8wzVOKQWI8-1)
 
-## SHARING/ACCESS INFORMATION 
-
-### Liscense: AGPLv3 License 
-
 ## INSTALLATION
 
 This project is developed in R and uses a Shiny-based interface.
 
 Required packages:
 
-`install.packages(c("tidyverse", "shiny", "magick"))`
+`install.packages(c("tidyverse", "shiny", "magick", "shinylive"))`
 
 
 ## Data Organisation
@@ -149,18 +154,17 @@ R/                              R source code
 data/                           Will contain rear udder reference images for input parameterization
 docs/                           Supporting documents
 ├── team_agreement.md           Team workflow guidelines and collaboration expectations
-├── goat_workflow.png           Diagram showing how project scripts and application components connect
-├── goat_timeline_workflow.png  Visual timeline of project development stages and milestones
 └── README_TEATS.md 
 images/
 ├── Ag-GOAT Figma.png           UI design prototype
+├── goat_workflow.png           Diagram showing how project scripts and application components connect
+├── goat_timeline_workflow.png  Visual timeline of project development stages and milestones
 └── teat_placement.png          ADGA diagram showing teat placement scoring scale
-R/                              R source code
 .gitignore                      Paths Git should ignore
 README.md                       This file
 ```
 
-### Supporting Documentation
+### API Documentation
 
 - [Goat Data Dictionary](docs/goat_data_dictionary.xlsx)  
   Reference document describing datasets, variables, trait abbreviations, and source information used throughout the project.
