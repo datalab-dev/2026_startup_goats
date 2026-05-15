@@ -17,6 +17,9 @@ version = "0.1.0"
 
 [dependencies]
 r = ">=4.5,<4.6"
+r-tidyverse = ">=2.0.0,<3"
+r-shiny = ">=1.13.0,<2"
+r-magick = ">=2.9.1,<3"
 
 [activation.env]
 # Make sure R only searches for packages within the Pixi environment.
