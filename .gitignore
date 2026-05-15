@@ -1,4 +1,5 @@
 # Add Project-specific Files HERE
+_build/*
 
 
 # DataLab Project Directory Structure

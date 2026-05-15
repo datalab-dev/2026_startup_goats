@@ -19,11 +19,19 @@ version = "0.1.0"
 cmd = "Rscript -e 'shiny::runApp(\"app\")'"
 description = "Run the Shiny app."
 
+[tasks.build]
+cmd = "Rscript -e 'shinylive::export(\"app\", \"_build\")'"
+description = "Export the Shiny app as a static site."
+
 [dependencies]
 r = ">=4.5,<4.6"
 r-tidyverse = ">=2.0.0,<3"
 r-shiny = ">=1.13.0,<2"
 r-magick = ">=2.9.1,<3"
+"r-data.table" = ">=1.17.8,<2"
+r-vroom = "<=1.6.5.9000"
+r-dplyr = "<=1.1.14"
+r-vctrs = "<=0.6.5"
 
 [activation.env]
 # Make sure R only searches for packages within the Pixi environment.
@@ -32,3 +40,6 @@ R_LIBS = "$PIXI_R_LIBS"
 R_LIBS_USER = "$PIXI_R_LIBS"
 R_LIBS_SITE = "$PIXI_R_LIBS"
 QUARTO_R = "$CONDA_PREFIX/bin/R"
+
+[target.linux-64.dependencies]
+r-archive = ">=1.1.13,<2"
