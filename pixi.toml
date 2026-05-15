@@ -15,6 +15,10 @@ version = "0.1.0"
 
 [tasks]
 
+[tasks.shiny-app]
+cmd = "Rscript -e 'shiny::runApp(\"app\")'"
+description = "Run the Shiny app."
+
 [dependencies]
 r = ">=4.5,<4.6"
 r-tidyverse = ">=2.0.0,<3"
