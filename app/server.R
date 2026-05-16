@@ -181,7 +181,7 @@ server <- function(input, output, session) {
   # expporting score data in the UCD Goat Lab Approved Format.
   output$export_data <- downloadHandler(
     filename = function() {
-      sprintf("goat_traits-%s.xlsx", format(Sys.time(), "%Y%m%d-%H%M%S"))
+      sprintf("goat_traits-%s.csv", format(Sys.time(), "%Y%m%d-%H%M%S"))
     },
     # REPLACE LATER !!!!!!!!
     content = function(file) {
@@ -192,10 +192,9 @@ server <- function(input, output, session) {
         "Medial Suspensory Ligament" = 0,
         "Teat Placement"             = 0,
         "Teat Diameter"              = 0,
-        "Teat Length"                = 0,
-        check.names = FALSE
+        "Teat Length"                = 0
       )
-      writexl::write_xlsx(export_df, file)
+      write.csv(export_df, file, row.names = FALSE)
     }
   )
 }

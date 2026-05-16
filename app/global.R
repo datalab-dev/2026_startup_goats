@@ -2,12 +2,12 @@ library(shiny)
 library(ggplot2)
 
 # source all the curves and the UI helper
-source("../R/leg_curve.R",    local = FALSE)
-source("../R/pelvic_curve.R", local = FALSE)
-source("../R/udder_curve.R",  local = FALSE)
-source("../R/medial_curve.R", local = FALSE)
-source("../R/teats_curve.R",  local = FALSE)
-source("../R/ui_helpers.R",   local = FALSE)
+source("./R/leg_curve.R")
+source("./R/pelvic_curve.R")
+source("./R/udder_curve.R")
+source("./R/medial_curve.R")
+source("./R/teats_curve.R")
+source("./R/ui_helpers.R")
 
 view_top    <-  3
 view_bottom <- -20
