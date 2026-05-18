@@ -162,9 +162,7 @@ teat_model <- function(teat_placement = 2.7, depth_of_medial = 0.15,
     teat_diameter <- score_to_teat_diameter(teat_diameter_score, goat_size)
     teat_placement <- score_to_teat_placement(teat_placement_score, leg_width)
     
-    # need to calculate depth of medial, udder floor height, leg width from
-    # the scores
-    # is this even possible? 
+    # need to take depth of medial, udder floor height, and leg width as an input
   }
   
   if (!is.numeric(c(teat_placement, depth_of_medial, udder_floor_height, teat_length, 
@@ -185,9 +183,33 @@ teat_model <- function(teat_placement = 2.7, depth_of_medial = 0.15,
 # the medial curve (udder floor) so the teats connect seamlessly to the udder body.
 # The bottom boundary is the teat parabola.
 teats_polygon_df <- function(teat_placement, depth_of_medial, udder_floor_height,
-                              teat_length, teat_diameter, leg_width,
-                              closeness_of_halves, n_points = 200) {
-
+                             teat_length, teat_diameter, leg_width, 
+                             closeness_of_halves, teat_length_score = NULL, 
+                             teat_diameter_score = NULL, 
+                             teat_placement_score = NULL, score_as_input = FALSE,
+                             goat_size = "standard", n_points = 200) {
+  if (score_as_input) {
+    if (anyNA(c(teat_length_score, teat_diameter_score, teat_placement_score))) {
+      stop("Score must be set as an input")
+    }
+    if (!is.numeric(c(teat_length_score, teat_diameter_score, 
+                      teat_placement_score))) {
+      stop("Input must be numeric")
+    }
+    
+    # calculate the goat measurements if scores are provided
+    teat_length <- score_to_teat_length(teat_length_score, goat_size)
+    teat_diameter <- score_to_teat_diameter(teat_diameter_score, goat_size)
+    teat_placement <- score_to_teat_placement(teat_placement_score, leg_width)
+    
+    # need to take depth of medial, udder floor height, and leg width as an input
+  }
+  
+  if (!is.numeric(c(teat_placement, depth_of_medial, udder_floor_height,
+                    teat_length, teat_diameter, leg_width, closeness_of_halves))) {
+    stop("Input must be numeric")
+  }
+  
   x_left  <- seq(-leg_width, 0, length.out = n_points)
   x_right <- seq(0, leg_width, length.out = n_points)
 
@@ -246,6 +268,6 @@ if (sys.nframe() == 0) {
     teat_length_score = 20, 
     teat_diameter_score = 21, 
     teat_placement_score = 22, 
-    score_as_input = TRUE,
+    score_as_input = TRUE
   )
 }
