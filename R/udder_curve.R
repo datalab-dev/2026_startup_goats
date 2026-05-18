@@ -11,19 +11,23 @@
 
 library(tidyverse)
 
-check_num <- function(x, name = deparse(substitute(x))) {
-  if (is.null(x)) stop(name, " is NULL")
-  if (!is.numeric(x)) stop(name, " is not numeric")
+# checks that an input will exist and is numeric before it is used in calculations.
+check_numeric_input <- function(x) {
+  name <- deparse(substitute(x))
+  
+  if (!is.numeric(x)) {
+    stop(name, " must be numeric")
+  }
 }
 
-check_score <- function(score) {
-  check_num(score)
+# Checks that a linear appraisal score is numeric and within the valid 5-50 range.
+check_score_in_valid_range <- function(score) {
+  check_numeric_input(score)
   
   if (score < 5 || score > 50) {
     stop("score must be between 5 and 50")
   }
 }
-
 # scoring functions 
 
 score_to_arch_roundness <- function(score) {
@@ -38,12 +42,12 @@ score_to_arch_height <- function(score) {
   scales::rescale(score, to = c(12, 16), from = c(5, 50))
 }
 
-score_to_arch_params <- function(rear_udder_arch_score,
+score_to_arch_inputs <- function(rear_udder_arch_score,
                                  rear_udder_height_score,
                                  leg_width) {
-  check_score(rear_udder_arch_score)
-  check_score(rear_udder_height_score)
-  check_num(leg_width)
+  check_score_in_valid_range(rear_udder_arch_score)
+  check_score_in_valid_range(rear_udder_height_score)
+  check_numeric_input(leg_width)
   
   list(
     arch_roundness = score_to_arch_roundness(rear_udder_arch_score),
