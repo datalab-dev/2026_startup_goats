@@ -256,6 +256,13 @@ teats_polygon_df <- function(teat_placement, depth_of_medial, udder_floor_height
     )
   }
 
+  # When the teat parabola sits entirely above the udder floor (e.g. a user
+  # snaps teat_length to its minimum), there's nothing to draw. Return an
+  # empty data.frame with the right columns so ggplot's aes() can still bind.
+  if (length(polys) == 0) {
+    return(data.frame(x = numeric(0), y = numeric(0), group = character(0)))
+  }
+
   do.call(rbind, polys)
 }
 
