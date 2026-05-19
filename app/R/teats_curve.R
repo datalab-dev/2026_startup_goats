@@ -18,6 +18,8 @@
 
 library(tidyverse)
 
+# inches -> score 
+
 score_to_teat_length <- function(score, goat_size = "standard") {
   if (goat_size == "standard") {
     scales::rescale(score, to = c(0.5, 5.0), from = c(5, 50))
@@ -144,6 +146,7 @@ if (sys.nframe() == 0) {
     udder_floor_height = 13,
     teat_length        = 2,
     teat_diameter      = 4.5,
-    leg_width = 4.3
+    leg_width = 4.3,
+    teat_length_score = 40
   )
 }
