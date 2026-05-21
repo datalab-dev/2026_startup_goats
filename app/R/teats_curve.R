@@ -137,6 +137,61 @@ teats_polygon_df <- function(teat_placement, teat_roundness, udder_floor_height,
 }
 
 
+# Closed polygons for both teats built directly from physical measurements
+# (used by the score-driven flow). Each teat is a symmetric parabola whose
+# vertex sits at (+/- teat_x_center, medial(teat_x_center) - teat_length_in)
+# and which reaches teat_diameter_in wide at the medial-floor level. The
+# top of each polygon traces the medial curve over the teat's x-range so
+# the teat joins the udder cleanly.
+teats_polygon_from_measurements <- function(teat_x_center, teat_diameter_in,
+                                            teat_length_in,
+                                            udder_floor_height,
+                                            closeness_of_halves,
+                                            depth_of_medial,
+                                            n_points = 200) {
+  teat_curvature <- 4 * teat_length_in / teat_diameter_in^2
+
+  build_side <- function(x_c, side) {
+    # building the x-range for the parabola and medial curve
+    x <- seq(x_c - (teat_diameter_in / 2), x_c + (teat_diameter_in / 2), length.out = n_points)
+
+    if (side == "r") {
+      # for the floor y-values, we need to evaluate the medial curve at the same x-values as the parabola. 
+      # The medial curve is defined as a parabola that opens upwards, with its vertex at (0, depth_of_medial - udder_floor_height). 
+      # The equation for the medial curve is:
+      floor_y <- depth_of_medial * (x - closeness_of_halves) *
+                 (x - (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+      base_y  <- depth_of_medial * (x_c - closeness_of_halves) *
+                 (x_c - (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+    } else {
+      floor_y <- depth_of_medial * (x + closeness_of_halves) *
+                 (x + (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+      base_y  <- depth_of_medial * (x_c + closeness_of_halves) *
+                 (x_c + (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+    }
+
+    # the parabola equation is defined as y = a(x - h)^2 + k, where (h, k) is the vertex
+    parab_y <- teat_curvature * (x - x_c)^2 + base_y - teat_length_in # subtract the teat length to get the vertex at the correct height
+
+    # combine into a df
+    data.frame(
+      x     = c(x, rev(x)),
+      y     = c(parab_y, rev(floor_y)),
+      group = paste0(side, "_teat")
+    )
+  }
+
+  rbind(
+    build_side( teat_x_center, "r"),
+    build_side(-teat_x_center, "l")
+  )
+}
+
+
 if (sys.nframe() == 0) {
   teat_model(
     teat_placement     = 2.5,
