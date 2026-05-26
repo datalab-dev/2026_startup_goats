@@ -266,7 +266,7 @@ ui <- fluidPage(
             br(),
             "and translate, scale, or rotate the image."),
         downloadButton("export_data", "Export CSV", class = "btn-default"),
-        downloadButton("export_pdf", "Export PDF", class = "btn-default")
+        downloadButton("export_png", "Export PNG", class = "btn-default")
       ),
 
       plotOutput("goat_plot", height = "640px"),

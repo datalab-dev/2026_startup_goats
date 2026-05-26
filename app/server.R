@@ -177,6 +177,98 @@ server <- function(input, output, session) {
       geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4)
   })
 
+  output$goat_plot <- renderPlot({
+    validate(need(all_params_filled(),
+                  "please fill out all values with numbers"))
+    
+    g <- ggplot() +
+      coord_fixed(xlim = c(-8, 8),
+                  ylim = c(view_bottom, view_top), expand = FALSE) +
+      theme_minimal() +
+      labs(title = NULL, x = "Horizontal position", y = "Vertical position")
+    
+    if (!is.null(input$goat_image)) {
+      raster <- goat_raster()
+      g <- g + annotation_raster(
+        raster,
+        xmin = (-8 - input$zoom)          + input$shift_x,
+        xmax = ( 8 + input$zoom)          + input$shift_x,
+        ymin = (view_bottom - input$zoom) + input$shift_y,
+        ymax = (view_top    + input$zoom) + input$shift_y
+      )
+    }
+    
+    p <- g +
+      geom_polygon(data = teats_poly(),  aes(x, y, group = group),
+                   fill = "mediumpurple", color = "mediumpurple3",
+                   linewidth = 1, alpha = 0.31) +
+      geom_polygon(data = pelvic_poly(), aes(x, y, group = group),
+                   fill = "steelblue", color = "steelblue",
+                   linewidth = 1, alpha = 0.45) +
+      geom_polygon(data = body_poly(),   aes(x, y, group = group),
+                   fill = "salmon", color = "firebrick",
+                   linewidth = 1, alpha = 0.5) +
+      geom_polygon(data = legs_poly(),   aes(x, y, group = group),
+                   fill = "gray60", color = "black",
+                   linewidth = 0.4, alpha = 0.5) +
+      geom_segment(data = hock_midline(),
+                   aes(x = x, y = y, xend = xend, yend = yend),
+                   color = "black", linewidth = 0.6) +
+      geom_polygon(data = hocks_poly(), aes(x, y, group = side),
+                   fill = "gray40", color = "black",
+                   linewidth = 0.5) +
+      geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4)
+    
+    saved_plot(p)  # save ggplot object
+    p              # return for display
+  })
+  
+  output$goat_plot <- renderPlot({
+    validate(need(all_params_filled(),
+                  "please fill out all values with numbers"))
+    
+    g <- ggplot() +
+      coord_fixed(xlim = c(-8, 8),
+                  ylim = c(view_bottom, view_top), expand = FALSE) +
+      theme_minimal() +
+      labs(title = NULL, x = "Horizontal position", y = "Vertical position")
+    
+    if (!is.null(input$goat_image)) {
+      raster <- goat_raster()
+      g <- g + annotation_raster(
+        raster,
+        xmin = (-8 - input$zoom)          + input$shift_x,
+        xmax = ( 8 + input$zoom)          + input$shift_x,
+        ymin = (view_bottom - input$zoom) + input$shift_y,
+        ymax = (view_top    + input$zoom) + input$shift_y
+      )
+    }
+    
+    p <- g +
+      geom_polygon(data = teats_poly(),  aes(x, y, group = group),
+                   fill = "mediumpurple", color = "mediumpurple3",
+                   linewidth = 1, alpha = 0.31) +
+      geom_polygon(data = pelvic_poly(), aes(x, y, group = group),
+                   fill = "steelblue", color = "steelblue",
+                   linewidth = 1, alpha = 0.45) +
+      geom_polygon(data = body_poly(),   aes(x, y, group = group),
+                   fill = "salmon", color = "firebrick",
+                   linewidth = 1, alpha = 0.5) +
+      geom_polygon(data = legs_poly(),   aes(x, y, group = group),
+                   fill = "gray60", color = "black",
+                   linewidth = 0.4, alpha = 0.5) +
+      geom_segment(data = hock_midline(),
+                   aes(x = x, y = y, xend = xend, yend = yend),
+                   color = "black", linewidth = 0.6) +
+      geom_polygon(data = hocks_poly(), aes(x, y, group = side),
+                   fill = "gray40", color = "black",
+                   linewidth = 0.5) +
+      geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4)
+    
+    saved_plot(p)  # save ggplot object
+    p              # return for display
+  })  
+  
   output$scale_indicator <- renderText({
     sprintf("scale: image visibility %d%%, zoom %s",
             input$img_opacity, format(input$zoom, nsmall = 1))
@@ -208,12 +300,14 @@ server <- function(input, output, session) {
       write.csv(export_df, file, row.names = FALSE)
     }
   )
-  output$export_pdf <- downloadHandler(
-    filename = function() { paste0("ag-goat-", Sys.Date(), ".pdf") },
+  
+  # use ggsave instead of downloadhandler
+  
+output$export_png <- downloadHandler(
+    filename = function() { paste0("ag-goat-", Sys.Date(), ".png") },
     content = function(file) {
-      pdf(file, width = 8, height = 10)
-      replayPlot(saved_plot())
-      dev.off()
+      req(saved_plot())
+      ggsave(file, plot = saved_plot(), device = "png", width = 8, height = 10, dpi = 300)
     }
   )
 }
