@@ -212,89 +212,144 @@ ui <- fluidPage(
     "))
   ),
 
+  # navigation buttons
   fluidRow(
-
-    # left side is the params control
-    column(width = 4,
-
-      div(class = "agheader",
-        div(
-          h1("Ag-GOAT", class = "agtitle"),
-          div(class = "agsub",
-              "Tap +/- to nudge by 0.5, type for a precise value, ",
-              "or hit ↻ to reset.")
-        )
-      ),
-
-      actionButton("reset_all",
-                   HTML("&#x21bb; Reset all goat parts"),
-                   class = "btn master-reset"),
-
-      section_card("Legs", "legs",
-        param_row("leg_width",   "leg width"),
-        param_row("hock_height", "hock height")
-      ),
-
-      section_card("Udder Arch", "udder",
-        param_row("arch_height",    "arch height"),
-        param_row("arch_roundness", "arch roundness"),
-        param_row("arch_shape",     "arch shape")
-      ),
-
-      section_card("Medial", "medial",
-        param_row("udder_floor_height",  "udder floor height"),
-        param_row("closeness_of_halves", "closeness of halves"),
-        param_row("depth_of_medial",     "medial cleft depth")
-      ),
-
-      section_card("Teats", "teats",
-        param_row("teat_placement", "teat placement"),
-        param_row("teat_length",    "teat length"),
-        param_row("teat_diameter",  "teat diameter")
-      ),
-
-      br(),
-      actionButton("calc_score", "Calculate Linear Appraisal Score",
-                   class = "btn calc-btn")
+    column(12,
+           div(style = "display:flex; justify-content:space-between; margin-bottom:10px;",
+               actionButton("nav_prev", "← Previous"),
+               actionButton("nav_next", "Next →")
+           )
+    )
+  ),
+  
+  # page system
+  tabsetPanel(
+    id = "page_tabs",
+    type = "hidden",
+    
+    # input user information page
+    tabPanel("user_information",
+             
+             fluidRow(
+               column(12,
+                      h2("Enter your information"),
+                      textInput("user_name", "Name"),
+                      textInput("user_email", "Email")
+               )
+             )
     ),
-
-    # right side has the graph and image overlay controls 
-    column(width = 8,
-      div(class = "agheader",
-        div(class = "blurb",
-            "ggplot2-based graph that lets you put an image on the graph,",
-            br(),
-            "and translate, scale, or rotate the image."),
-        downloadButton("export_data", "Export Data", class = "btn-default")
-      ),
-
-      plotOutput("goat_plot", height = "640px"),
-
-      div(class = "image-card",
-        div(class = "section-title",
-            style = "color: #555;", "Image Overlay"),
-        fluidRow(
-          column(6,
-            fileInput("goat_image", "Upload or take a photo of the udder",
-                      accept = "image/*")
+    
+    # goat selection page    
+    tabPanel("goat_selection",
+             fluidRow(
+               column(12,
+                      h2("Select a Goat"),
+                      
+                      fluidRow(
+                        column(6,
+                               textInput("owner_name_filter", "Owner Name filter")
+                        ),
+                        column(6,
+                               textInput("owner_id_filter", "Owner ID filter")
+                        )
+                      ),
+                      
+                      actionButton("search_goats", "Search", 
+                                   class = "btn btn-primary",
+                                   style = "margin-bottom: 15px; width: 100%;"),
+                      
+                      # display area for goat results
+                      uiOutput("goat_results")
+               )
+             )
+    ),
+    
+    # goat visualizer page
+    tabPanel("goat_visualizer",
+      fluidRow(
+        # left side is the params control
+        column(width = 4,
+    
+          div(class = "agheader",
+            div(
+              h1("Ag-GOAT", class = "agtitle"),
+              div(class = "agsub",
+                  "Tap +/- to nudge by 0.5, type for a precise value, ",
+                  "or hit ↻ to reset.")
+            )
           ),
-          column(6,
-            sliderInput("img_opacity", "image visibility",
-                        min = 0, max = 100, value = 70, step = 5,
-                        post = "%")
+    
+          actionButton("reset_all",
+                       HTML("&#x21bb; Reset all goat parts"),
+                       class = "btn master-reset"),
+    
+          section_card("Legs", "legs",
+            param_row("leg_width",   "leg width"),
+            param_row("hock_height", "hock height")
+          ),
+    
+          section_card("Udder Arch", "udder",
+            param_row("arch_height",    "arch height"),
+            param_row("arch_roundness", "arch roundness"),
+            param_row("arch_shape",     "arch shape")
+          ),
+    
+          section_card("Medial", "medial",
+            param_row("udder_floor_height",  "udder floor height"),
+            param_row("closeness_of_halves", "closeness of halves"),
+            param_row("depth_of_medial",     "medial cleft depth")
+          ),
+    
+          section_card("Teats", "teats",
+            param_row("teat_placement", "teat placement"),
+            param_row("teat_length",    "teat length"),
+            param_row("teat_diameter",  "teat diameter")
+          ),
+    
+          br(),
+          actionButton("calc_score", "Calculate Linear Appraisal Score",
+                       class = "btn calc-btn")
+        ),
+    
+        # right side has the graph and image overlay controls 
+        column(width = 8,
+          div(class = "agheader",
+            div(class = "blurb",
+                "ggplot2-based graph that lets you put an image on the graph,",
+                br(),
+                "and translate, scale, or rotate the image."),
+            downloadButton("export_data", "Export Data", class = "btn-default")
+          ),
+    
+          plotOutput("goat_plot", height = "640px"),
+    
+          div(class = "image-card",
+            div(class = "section-title",
+                style = "color: #555;", "Image Overlay"),
+            fluidRow(
+              column(6,
+                fileInput("goat_image", "Upload or take a photo of the udder",
+                          accept = "image/*")
+              ),
+              column(6,
+                sliderInput("img_opacity", "image visibility",
+                            min = 0, max = 100, value = 70, step = 5,
+                            post = "%")
+              )
+            ),
+            fluidRow(
+              column(3, sliderInput("zoom",     "zoom",
+                                    min = -3, max = 5, value = 1.5, step = 0.1)),
+              column(3, sliderInput("shift_x",  "shift x",
+                                    min = -10, max = 10, value = -0.5, step = 0.1)),
+              column(3, sliderInput("shift_y",  "shift y",
+                                    min = -15, max = 15, value = -0.5, step = 0.1)),
+              column(3, sliderInput("rotation", "rotation (deg)",
+                                    min = -180, max = 180, value = 0, step = 1))
+            ),
+            div(class = "scale", textOutput("scale_indicator", inline = TRUE))
           )
-        ),
-        fluidRow(
-          column(3, sliderInput("zoom",     "zoom",
-                                min = -3, max = 5, value = 1.5, step = 0.1)),
-          column(3, sliderInput("shift_x",  "shift x",
-                                min = -10, max = 10, value = -0.5, step = 0.1)),
-          column(3, sliderInput("shift_y",  "shift y",
-                                min = -15, max = 15, value = -0.5, step = 0.1)),
-          column(3, sliderInput("rotation", "rotation (deg)",
-                                min = -180, max = 180, value = 0, step = 1))
-        ),
-        div(class = "scale", textOutput("scale_indicator", inline = TRUE))
+        )
       )
     )
   )
