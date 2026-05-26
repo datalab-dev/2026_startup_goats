@@ -32,6 +32,9 @@
 
 library(ggplot2)
 
+
+# put this into a utilities script (source it)
+
 check_numeric_input <- function(x) { # checks input if it is numeric 
   name <- deparse(substitute(x))
   
@@ -40,6 +43,7 @@ check_numeric_input <- function(x) { # checks input if it is numeric
   }
 }
 
+#same thing with this make a util script to call it so it makes it easier to read 
 # this will check if the linear appraisal score is numeric and within the given range
 check_score_in_valid_range <- function(score, min_score, max_score) {
   check_numeric_input(score)
@@ -49,49 +53,35 @@ check_score_in_valid_range <- function(score, min_score, max_score) {
   }
 }
 
-generate_left_curve <- function(udder_floor_height = 13, closeness_of_halves = 1,
-                                depth_of_medial = 0.15, leg_width = 4.6,
-                                n_points = 200) {
+generate_medial_curve <- function(udder_floor_height = 13,
+                                  closeness_of_halves = 1,
+                                  depth_of_medial = 0.15,
+                                  leg_width = 4.6,
+                                  n_points = 200) {
   check_numeric_input(udder_floor_height)
   check_numeric_input(closeness_of_halves)
   check_numeric_input(depth_of_medial)
   check_numeric_input(leg_width)
   check_numeric_input(n_points)
-
-  x <- seq(-leg_width, 0, length.out = n_points)
-  y <- depth_of_medial * (x + closeness_of_halves) *
-       (x + (closeness_of_halves + 2)) +
-       depth_of_medial - udder_floor_height
-  data.frame(x = x, y = y)
-}
-
-generate_right_curve <- function(udder_floor_height = 13, closeness_of_halves = 1,
-                                 depth_of_medial = 0.15, leg_width = 4.6,
-                                 n_points = 200) {
-  check_numeric_input(udder_floor_height)
-  check_numeric_input(closeness_of_halves)
-  check_numeric_input(depth_of_medial)
-  check_numeric_input(leg_width)
-  check_numeric_input(n_points)
-
-  x <- seq(0, leg_width, length.out = n_points)
-  y <- depth_of_medial * (x - closeness_of_halves) *
-       (x - (closeness_of_halves + 2)) +
-       depth_of_medial - udder_floor_height
-  data.frame(x = x, y = y)
-}
-
-medial_df <- function(udder_floor_height = 13, closeness_of_halves = 1,
-                      depth_of_medial = 0.15, leg_width = 4.6,
-                      n_points = 200) {
+  
+  x_left  <- seq(-leg_width, 0, length.out = n_points)
+  x_right <- seq(0, leg_width, length.out = n_points)
+  
+  # directly mirrors Desmos: m(x) = q(x+p)(x+(p+2)) + q - o
+  y_left  <- depth_of_medial * (x_left  + closeness_of_halves) *
+    (x_left  + (closeness_of_halves + 2)) +
+    depth_of_medial - udder_floor_height
+  
+  # n(x) = q(x-p)(x-(p+2)) + q - o
+  y_right <- depth_of_medial * (x_right - closeness_of_halves) *
+    (x_right - (closeness_of_halves + 2)) +
+    depth_of_medial - udder_floor_height
+  
   rbind(
-    generate_left_curve(udder_floor_height, closeness_of_halves,
-                        depth_of_medial, leg_width, n_points),
-    generate_right_curve(udder_floor_height, closeness_of_halves,
-                         depth_of_medial, leg_width, n_points)
+    data.frame(x = x_left,  y = y_left),
+    data.frame(x = x_right, y = y_right)
   )
 }
-
 
 # Closed polygon for the full udder body.
 # Traced: left medial curve (bottom-left) → right medial curve (bottom-right)
@@ -117,10 +107,18 @@ body_polygon_df <- function(udder_floor_height, closeness_of_halves, depth_of_me
 
 # --- Scoring functions ---
 
+# instead of 5 -> 45 the scale on the SOp should be updated from 1-50 to show
+# what is biologically possible 
+
 score_to_estimated_medial_cleft_inches <- function(score) {
   check_score_in_valid_range(score, min_score = 5, max_score = 45)
   
-  scales::rescale(score, to = c(-1, 3), from = c(5, 45))
+  approx(
+    x = c(5, 15, 25, 35, 45),
+    y = c(-0.75, 0, 0.75, 1.75, 3),
+    xout = score,
+    rule = 2
+  )$y
 }
 
 # the medial scores that tend to be higher should show a more defined cleft
@@ -210,26 +208,36 @@ medial_visualization_from_scores <- function(medial_score,
                                              udder_depth_score,
                                              leg_width = 4.6,
                                              n_points = 200) {
-  medial_inputs <- score_to_medial_inputs(
-    medial_score = medial_score,
-    udder_depth_score = udder_depth_score,
-    leg_width = leg_width
+  params <- score_to_medial_inputs(medial_score, udder_depth_score, leg_width)
+  
+  df <- generate_medial_curve(
+    udder_floor_height  = params$udder_floor_height_from_hock,
+    closeness_of_halves = params$closeness_of_halves,
+    depth_of_medial     = params$depth_of_medial,
+    leg_width           = leg_width,
+    n_points            = n_points
   )
   
-  medial_visualization(
-    udder_floor_height_from_hock = medial_inputs$udder_floor_height_from_hock,
-    closeness_of_halves = medial_inputs$closeness_of_halves,
-    depth_of_medial = medial_inputs$depth_of_medial,
-    leg_width = medial_inputs$leg_width,
-    n_points = n_points
-  )
+  ggplot(df, aes(x = x, y = y)) +
+    geom_line(linewidth = 1.1, color = "black") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+    coord_equal() +
+    theme_minimal() +
+    labs(
+      title    = "Goat Medial Suspensory Ligament",
+      subtitle = paste(
+        "medial score =", medial_score,
+        "| udder depth score =", udder_depth_score
+      ),
+      x = "Horizontal position",
+      y = "Vertical position relative to hock"
+    )
 }
-
 if (sys.nframe() == 0) {
   p <- medial_visualization_from_scores(
     medial_score = 30,
-    udder_depth_score = 25,
-    leg_width = 4.6
+    udder_depth_score = 30,
+    leg_width = 4
   )
   
   print(p)
