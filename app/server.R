@@ -1,5 +1,10 @@
 server <- function(input, output, session) {
-
+    
+  saved_plot <- reactiveVal(NULL) 
+    
+  for (param_id in names(PARAM_DEFAULTS)) 
+ 
+  
   # incremental buttons for each param
   # the +/- buttons always move by ±0.5 per the Ag-GOAT notes, regardless of
   # the numericInput's own step (which is the granularity for keyboard arrows).
@@ -119,6 +124,12 @@ server <- function(input, output, session) {
 
   # plotting the graph 
   output$goat_plot <- renderPlot({
+    
+    geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4)  # last existing line
+    
+    p <- recordPlot()  
+    saved_plot(p)   
+    
     validate(need(all_params_filled(),
                   "please fill out all values with numbers"))
 
@@ -195,6 +206,14 @@ server <- function(input, output, session) {
         "Teat Length"                = 0
       )
       write.csv(export_df, file, row.names = FALSE)
+    }
+  )
+  output$export_pdf <- downloadHandler(
+    filename = function() { paste0("ag-goat-", Sys.Date(), ".pdf") },
+    content = function(file) {
+      pdf(file, width = 8, height = 10)
+      replayPlot(saved_plot())
+      dev.off()
     }
   )
 }
