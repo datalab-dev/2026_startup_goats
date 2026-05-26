@@ -20,6 +20,9 @@ check_numeric_input <- function(x) {
   }
 }
 
+# source these utilities script into each one of these scripts so its easier to read 
+
+
 # Checks that a linear appraisal score is numeric and within the valid 5-50 range.
 check_score_in_valid_range <- function(score) {
   check_numeric_input(score)
@@ -28,6 +31,7 @@ check_score_in_valid_range <- function(score) {
     stop("score must be between 5 and 50")
   }
 }
+
 # scoring functions 
 
 score_to_arch_roundness <- function(score) {
@@ -60,11 +64,11 @@ score_to_arch_inputs <- function(rear_udder_arch_score,
 
 generate_arch <- function(arch_roundness, arch_height, arch_shape,
                           leg_width, n_points = 300) {
-  check_num(arch_roundness)
-  check_num(arch_height)
-  check_num(arch_shape)
-  check_num(leg_width)
-  check_num(n_points)
+  check_numeric_input(arch_roundness)
+  check_numeric_input(arch_height)
+  check_numeric_input(arch_shape)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
 
   if (arch_shape <= leg_width) {
     stop("Need arch_shape > leg_width so that arch_shape - |x| > 0 for all x.")
@@ -78,11 +82,11 @@ generate_arch <- function(arch_roundness, arch_height, arch_shape,
 
 generate_and_plot_udder_arch <- function(arch_roundness, arch_height, arch_shape,
                                          leg_width, n_points = 300) {
-  check_num(arch_roundness)
-  check_num(arch_height)
-  check_num(arch_shape)
-  check_num(leg_width)
-  check_num(n_points)
+  check_numeric_input(arch_roundness)
+  check_numeric_input(arch_height)
+  check_numeric_input(arch_shape)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
 
   arch_df <- tryCatch(
     generate_arch(arch_roundness, arch_height, arch_shape, leg_width, n_points),
@@ -118,7 +122,7 @@ generate_and_plot_udder_arch_from_scores <- function(rear_udder_arch_score,
                                                      rear_udder_height_score,
                                                      leg_width,
                                                      n_points = 300) {
-  params <- score_to_arch_params(
+  params <- score_to_arch_inputs(
     rear_udder_arch_score   = rear_udder_arch_score,
     rear_udder_height_score = rear_udder_height_score,
     leg_width               = leg_width
@@ -134,7 +138,7 @@ generate_and_plot_udder_arch_from_scores <- function(rear_udder_arch_score,
 }
 
 main <- function() {
-  rear_udder_arch_score   <- 25
+  rear_udder_arch_score   <- 35
   rear_udder_height_score <- 25
   leg_width               <- 2
   
