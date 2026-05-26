@@ -58,4 +58,4 @@ SECTION_PALETTE <- list(
 )
 
 # database containing goat information
-goat_database <- read.csv("./data/goat_database.csv", stringsAsFactors = FALSE)
+goat_database <- read.csv("./data/goat_database.csv", stringsAsFactors = FALSE, check.names = FALSE)
