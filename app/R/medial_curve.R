@@ -32,11 +32,7 @@
 
 library(ggplot2)
 
-check_num <- function(x) {
-  if (is.null(x))     print("Argument is NULL")
-  if (!is.numeric(x)) print("Argument is not numeric")
-}
-
+# check_num() now lives in R/utils.R (sourced first in global.R).
 
 generate_left_curve <- function(udder_floor_height = 13, closeness_of_halves = 1,
                                 depth_of_medial = 0.15, leg_width = 4.6,

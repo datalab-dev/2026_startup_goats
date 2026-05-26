@@ -11,9 +11,8 @@ server <- function(input, output, session) {
       bounds      <- PARAM_BOUNDS[[pid]]
 
       bump <- function(delta) {
-        cur <- input[[pid]]
-        if (is.null(cur) || is.na(cur)) return(invisible())
-        new_val <- max(bounds$min, min(bounds$max, cur + delta))
+        new_val <- clamp_numeric(input[[pid]] + delta, bounds$min, bounds$max)
+        if (is.null(new_val)) return(invisible())
         updateNumericInput(session, pid, value = new_val)
       }
 
@@ -29,14 +28,14 @@ server <- function(input, output, session) {
         updateNumericInput(session, pid, value = bounds$max)
       })
 
-      # clamp out-of-range typed values back into the allowed window.
+      # clamp out-of-range typed values back into the allowed window and cap
+      # them at 2-dp. Only write back when the cleaned value actually differs,
+      # so we don't reset the cursor on every valid keystroke.
       observeEvent(input[[pid]], {
-        v <- input[[pid]]
-        if (is.null(v) || is.na(v)) return()
-        if (v < bounds$min) {
-          updateNumericInput(session, pid, value = bounds$min)
-        } else if (v > bounds$max) {
-          updateNumericInput(session, pid, value = bounds$max)
+        cleaned <- clamp_numeric(input[[pid]], bounds$min, bounds$max)
+        if (is.null(cleaned)) return()
+        if (!isTRUE(all.equal(cleaned, input[[pid]]))) {
+          updateNumericInput(session, pid, value = cleaned)
         }
       }, ignoreInit = TRUE)
     })
@@ -46,17 +45,15 @@ server <- function(input, output, session) {
   # changes or a new lock-in. Reading score inputs here would re-trigger the
   # renderPlot (and the white-out animation) on every score keystroke even
   # though the scores aren't applied until Create Visual is clicked.
-  is_filled <- function(v) {
-    !is.null(v) && length(v) == 1 && !is.na(v) && is.numeric(v)
-  }
-
+  # is_valid_number() lives in R/utils.R.
   adjustable_params_filled <- reactive({
-    all(vapply(names(ADJUSTABLE_DEFAULTS), function(pid) is_filled(input[[pid]]),
+    all(vapply(names(ADJUSTABLE_DEFAULTS),
+               function(pid) is_valid_number(input[[pid]]),
                logical(1)))
   })
 
   locked_scores_filled <- reactive({
-    all(vapply(locked_scores(), is_filled, logical(1)))
+    all(vapply(locked_scores(), is_valid_number, logical(1)))
   })
 
   observeEvent(input$reset_all, {
@@ -93,10 +90,11 @@ server <- function(input, output, session) {
               input$arch_leg_y, arch_vertex_y)
     ))
     scores_to_geometry(
-      scores      = s,
-      hock_height = input$hock_height,
-      leg_width   = input$leg_width,
-      arch_leg_y  = input$arch_leg_y
+      scores         = s,
+      hock_height    = input$hock_height,
+      leg_width      = input$leg_width,
+      arch_leg_y     = input$arch_leg_y,
+      arch_shape_pad = input$arch_shape_pad
     )
   })
 

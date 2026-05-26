@@ -246,9 +246,10 @@ ui <- fluidPage(
       br(), br(),
 
       section_card("Adjustable Parts", "adjustable",
-        param_row("hock_height", "hock height"),
-        param_row("leg_width",   "leg width"),
-        param_row("arch_leg_y",  "arch leg y")
+        param_row("hock_height",    "hock height"),
+        param_row("leg_width",      "leg width"),
+        param_row("arch_leg_y",     "arch leg y"),
+        param_row("arch_shape_pad", "arch roundness")
       )
     ),
 

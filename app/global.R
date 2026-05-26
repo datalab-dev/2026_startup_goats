@@ -1,7 +1,8 @@
 library(shiny)
 library(ggplot2)
 
-# source all the curves, score-geometry layer, and the UI helper
+# source shared helpers first, then the curves, score-geometry layer, and UI helper
+source("./R/utils.R")
 source("./R/leg_curve.R")
 source("./R/pelvic_curve.R")
 source("./R/udder_curve.R")
@@ -36,15 +37,17 @@ SCORE_BOUNDS <- list(
 # cdjustable geometric params exposed to the user after the visual is
 # created. Everything else is derived from the scores
 ADJUSTABLE_DEFAULTS <- list(
-  hock_height = 18,
-  leg_width   = 4.5,
-  arch_leg_y  = -5.5
+  hock_height    = 18,
+  leg_width      = 4.5,
+  arch_leg_y     = -5.5,
+  arch_shape_pad = 1.5   # udder-arch shoulder roundness (small=pointed, large=rounded)
 )
 
 ADJUSTABLE_BOUNDS <- list(
-  hock_height = list(min = 5,    max = 25, step = 0.5),
-  leg_width   = list(min = 1,    max = 8,  step = 0.1),
-  arch_leg_y  = list(min = -15,  max = -1, step = 0.1)
+  hock_height    = list(min = 5,    max = 25,  step = 0.5),
+  leg_width      = list(min = 1,    max = 8,   step = 0.1),
+  arch_leg_y     = list(min = -15,  max = -1,  step = 0.1),
+  arch_shape_pad = list(min = 0.5,  max = 2.5, step = 0.1)
 )
 
 # combined for the param_row helper (which keys off these lists).

@@ -11,12 +11,9 @@
 
 library(tidyverse)
 
-check_num <- function(x) {
-  if (is.null(x))     print("Argument is NULL")
-  if (!is.numeric(x)) print("Argument is not numeric")
-}
+# check_num() now lives in R/utils.R (sourced first in global.R).
 
-# scoring functions 
+# scoring functions
 
 score_to_arch_roundness <- function(score) {
   scales::rescale(score, to = c(18, 4), from = c(5, 50))

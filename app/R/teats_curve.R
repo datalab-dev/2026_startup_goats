@@ -149,6 +149,8 @@ teats_polygon_from_measurements <- function(teat_x_center, teat_diameter_in,
                                             closeness_of_halves,
                                             depth_of_medial,
                                             n_points = 200) {
+
+  # default teat paraboula with the height and width of the teat length and diameter respectively                                              
   teat_curvature <- 4 * teat_length_in / teat_diameter_in^2
 
   build_side <- function(x_c, side) {
@@ -174,10 +176,20 @@ teats_polygon_from_measurements <- function(teat_x_center, teat_diameter_in,
                  depth_of_medial - udder_floor_height
     }
 
-    # the parabola equation is defined as y = a(x - h)^2 + k, where (h, k) is the vertex
+    # the parabola equation is defined as y = a(x - h)^2 + k, where (h, k) is the vertex of the teat, so the bottom curve of the teat
     parab_y <- teat_curvature * (x - x_c)^2 + base_y - teat_length_in # subtract the teat length to get the vertex at the correct height
 
-    # combine into a df
+    # creating a mask to keep points where the parabola is below the medial curve (the udder floor)
+    # this ensures that when its rendered all together, the teats will be drawn below the udder floor and not intersect it
+    mask <- parab_y < floor_y
+    if (!any(mask)) {
+      return(data.frame(x = numeric(0), y = numeric(0), group = character(0)))
+    }
+    x       <- x[mask]
+    parab_y <- parab_y[mask]
+    floor_y <- floor_y[mask]
+
+    # combine into a closed polygon: parabola (bottom) out, floor (top) back.
     data.frame(
       x     = c(x, rev(x)),
       y     = c(parab_y, rev(floor_y)),
