@@ -235,7 +235,7 @@ medial_visualization_from_scores <- function(medial_score,
 }
 if (sys.nframe() == 0) {
   p <- medial_visualization_from_scores(
-    medial_score = 30,
+    medial_score = 25,
     udder_depth_score = 30,
     leg_width = 4
   )
