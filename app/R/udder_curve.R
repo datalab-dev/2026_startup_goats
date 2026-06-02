@@ -11,28 +11,9 @@
 
 library(tidyverse)
 
-# checks that an input will exist and is numeric before it is used in calculations.
-check_numeric_input <- function(x) {
-  name <- deparse(substitute(x))
-  
-  if (!is.numeric(x)) {
-    stop(name, " must be numeric")
-  }
-}
+# check_num() now lives in R/utils.R (sourced first in global.R).
 
-# source these utilities script into each one of these scripts so its easier to read 
-
-
-# Checks that a linear appraisal score is numeric and within the valid 5-50 range.
-check_score_in_valid_range <- function(score) {
-  check_numeric_input(score)
-  
-  if (score < 5 || score > 50) {
-    stop("score must be between 5 and 50")
-  }
-}
-
-# scoring functions 
+# scoring functions
 
 score_to_arch_roundness <- function(score) {
   scales::rescale(score, to = c(18, 4), from = c(5, 50))

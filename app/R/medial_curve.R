@@ -32,8 +32,7 @@
 
 library(ggplot2)
 
-
-# put this into a utilities script (source it)
+# check_num() now lives in R/utils.R (sourced first in global.R).
 
 check_numeric_input <- function(x) { # checks input if it is numeric 
   name <- deparse(substitute(x))
