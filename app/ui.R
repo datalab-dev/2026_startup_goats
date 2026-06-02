@@ -221,41 +221,36 @@ ui <- fluidPage(
         div(
           h1("Ag-GOAT", class = "agtitle"),
           div(class = "agsub",
-              "Tap +/- to nudge by 0.5, type for a precise value, ",
-              "or hit ↻ to reset.")
+              "Enter the 6 linear appraisal scores, hit ",
+              tags$b("Create Visual"),
+              ", then fine-tune hock, legs, and udder-arch attachment below.")
         )
       ),
 
       actionButton("reset_all",
-                   HTML("&#x21bb; Reset all goat parts"),
+                   HTML("&#x21bb; Reset all inputs"),
                    class = "btn master-reset"),
 
-      section_card("Legs", "legs",
-        param_row("leg_width",   "leg width"),
-        param_row("hock_height", "hock height")
+      section_card("Linear Appraisal Scores", "scores",
+        param_row("udder_depth_score",       "udder depth"),
+        param_row("rear_udder_height_score", "rear udder height"),
+        param_row("medial_score",            "medial ligament"),
+        param_row("teat_length_score",       "teat length"),
+        param_row("teat_diameter_score",     "teat diameter"),
+        param_row("teat_placement_score",    "teat placement")
       ),
 
-      section_card("Udder Arch", "udder",
-        param_row("arch_height",    "arch height"),
-        param_row("arch_roundness", "arch roundness"),
-        param_row("arch_shape",     "arch shape")
-      ),
+      actionButton("create_visual", "Create Visual",
+                   class = "btn calc-btn"),
 
-      section_card("Medial", "medial",
-        param_row("udder_floor_height",  "udder floor height"),
-        param_row("closeness_of_halves", "closeness of halves"),
-        param_row("depth_of_medial",     "medial cleft depth")
-      ),
+      br(), br(),
 
-      section_card("Teats", "teats",
-        param_row("teat_placement", "teat placement"),
-        param_row("teat_length",    "teat length"),
-        param_row("teat_diameter",  "teat diameter")
-      ),
-
-      br(),
-      actionButton("calc_score", "Calculate Linear Appraisal Score",
-                   class = "btn calc-btn")
+      section_card("Adjustable Parts", "adjustable",
+        param_row("hock_height",    "hock height"),
+        param_row("leg_width",      "leg width"),
+        param_row("arch_leg_y",     "arch leg y"),
+        param_row("arch_shape_pad", "arch roundness")
+      )
     ),
 
     # right side has the graph and image overlay controls 
@@ -288,7 +283,7 @@ ui <- fluidPage(
           )
         ),
         fluidRow(
-          column(3, sliderInput("zoom",     "zoom",
+          column(3, sliderInput("zoom", "zoom",
                                 min = -3, max = 5, value = 1.5, step = 0.1)),
           column(3, sliderInput("shift_x",  "shift x",
                                 min = -10, max = 10, value = -0.5, step = 0.1)),

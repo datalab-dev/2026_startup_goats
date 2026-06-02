@@ -11,12 +11,9 @@
 
 library(tidyverse)
 
-check_num <- function(x) {
-  if (is.null(x))     print("Argument is NULL")
-  if (!is.numeric(x)) print("Argument is not numeric")
-}
+# check_num() now lives in R/utils.R (sourced first in global.R).
 
-# scoring functions 
+# scoring functions
 
 score_to_arch_roundness <- function(score) {
   scales::rescale(score, to = c(18, 4), from = c(5, 50))
@@ -26,20 +23,38 @@ score_to_arch_shape <- function(score, leg_width) {
   scales::rescale(score, to = c(leg_width + 0.25, leg_width + 4), from = c(5, 50))
 }
 
+score_to_arch_height <- function(score) {
+  scales::rescale(score, to = c(12, 16), from = c(5, 50))
+}
+
+score_to_arch_inputs <- function(rear_udder_arch_score,
+                                 rear_udder_height_score,
+                                 leg_width) {
+  check_score_in_valid_range(rear_udder_arch_score)
+  check_score_in_valid_range(rear_udder_height_score)
+  check_numeric_input(leg_width)
+  
+  list(
+    arch_roundness = score_to_arch_roundness(rear_udder_arch_score),
+    arch_shape     = score_to_arch_shape(rear_udder_arch_score, leg_width),
+    arch_height    = score_to_arch_height(rear_udder_height_score)
+  )
+}
+
 # arch generation
 
 generate_arch <- function(arch_roundness, arch_height, arch_shape,
                           leg_width, n_points = 300) {
-  check_num(arch_roundness)
-  check_num(arch_height)
-  check_num(arch_shape)
-  check_num(leg_width)
-  check_num(n_points)
+  check_numeric_input(arch_roundness)
+  check_numeric_input(arch_height)
+  check_numeric_input(arch_shape)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
 
   if (arch_shape <= leg_width) {
-    print("Need arch_shape > leg_width so that arch_shape - |x| > 0 for all x.")
+    stop("Need arch_shape > leg_width so that arch_shape - |x| > 0 for all x.")
   }
-
+  
   x <- seq(-leg_width, leg_width, length.out = n_points)
   y <- -arch_roundness * (arch_shape - abs(x))^(-1/2) + arch_height
 
@@ -48,11 +63,11 @@ generate_arch <- function(arch_roundness, arch_height, arch_shape,
 
 generate_and_plot_udder_arch <- function(arch_roundness, arch_height, arch_shape,
                                          leg_width, n_points = 300) {
-  check_num(arch_roundness)
-  check_num(arch_height)
-  check_num(arch_shape)
-  check_num(leg_width)
-  check_num(n_points)
+  check_numeric_input(arch_roundness)
+  check_numeric_input(arch_height)
+  check_numeric_input(arch_shape)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
 
   arch_df <- tryCatch(
     generate_arch(arch_roundness, arch_height, arch_shape, leg_width, n_points),
@@ -84,14 +99,36 @@ generate_and_plot_udder_arch <- function(arch_roundness, arch_height, arch_shape
     )
 }
 
-main <- function() {
-  arch_roundness     <- 14
-  arch_height        <- 14
-  arch_shape         <- 3
-  leg_width <- 2
+generate_and_plot_udder_arch_from_scores <- function(rear_udder_arch_score,
+                                                     rear_udder_height_score,
+                                                     leg_width,
+                                                     n_points = 300) {
+  params <- score_to_arch_inputs(
+    rear_udder_arch_score   = rear_udder_arch_score,
+    rear_udder_height_score = rear_udder_height_score,
+    leg_width               = leg_width
+  )
+  
+  generate_and_plot_udder_arch(
+    arch_roundness = params$arch_roundness,
+    arch_height    = params$arch_height,
+    arch_shape     = params$arch_shape,
+    leg_width      = leg_width,
+    n_points       = n_points
+  )
+}
 
-  p <- generate_and_plot_udder_arch(arch_roundness, arch_height,
-                                    arch_shape, leg_width)
+main <- function() {
+  rear_udder_arch_score   <- 35
+  rear_udder_height_score <- 25
+  leg_width               <- 2
+  
+  p <- generate_and_plot_udder_arch_from_scores(
+    rear_udder_arch_score   = rear_udder_arch_score,
+    rear_udder_height_score = rear_udder_height_score,
+    leg_width               = leg_width
+  )
+  
   if (!is.null(p)) print(p)
 }
 

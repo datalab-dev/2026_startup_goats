@@ -10,13 +10,16 @@
 
 # Parameters:
 # teat_placement   = distance from center to each teat (halves the teat when 0)
-# teat_roundness   = distance between parabola roots; controls teat width
+# teat_roundness/depth_of_medial   = distance between parabola roots; controls teat width (q: depth of medial on desmos)
 # udder_floor_height = where the udder floor sits (shared with medial)
 # teat_length      = how far the teat hangs below the udder floor
 # teat_diameter    = width scaling of the teat
 # leg_width = horizontal boundary for the plot x-range
 
-library(tidyverse)
+library(ggplot2)
+source("app/R/utils.R")
+
+# inches -> score 
 
 score_to_teat_length <- function(score, goat_size = "standard") {
   if (goat_size == "standard") {
@@ -28,67 +31,117 @@ score_to_teat_length <- function(score, goat_size = "standard") {
   }
 }
 
-score_to_teat_diameter <- function(score, goat_size = "standard") {
-  if (goat_size == "standard") {
-    scales::rescale(score, to = c(0.5, 2.5), from = c(5, 45))
-  } else if (goat_size == "miniature") {
-    scales::rescale(score, to = c(0.25, 1.25), from = c(5, 45))
-  } else {
-    stop("goat_size must be 'standard' or 'miniature'")
-  }
-}
+#
+# functions to be used for making visualizations
+#
 
-teat_model <- function(teat_placement, teat_roundness, udder_floor_height,
-                       teat_length, teat_diameter, leg_width,
-                       teat_length_score = NULL,
-                       goat_size = "standard",
-                       n_points = 200) {
-  
-  if (!is.null(teat_length_score)) {
-    teat_length <- score_to_teat_length(
-      score = teat_length_score,
-      goat_size = goat_size
-    )
+# makes a dataframe for plotting the teats
+teats_df <- function (teat_placement = 2.7, depth_of_medial = 0.15, 
+                      udder_floor_height = 13, teat_length = 1.4,
+                      teat_diameter = 3.5, leg_width = 4.6,
+                      n_points = 200) {
+  if (!is.numeric(c(teat_placement, depth_of_medial, udder_floor_height, 
+                    teat_length, teat_diameter, leg_width, n_points))) {
+    stop("Input must be numeric")
   }
   
   x_left  <- seq(-leg_width, 0, length.out = n_points)
   x_right <- seq(0, leg_width, length.out = n_points)
   
   y_left  <- teat_diameter * (x_left  + teat_placement) *
-    (x_left  + (teat_roundness + teat_placement)) -
+    (x_left  + (depth_of_medial + teat_placement)) -
     (udder_floor_height + teat_length)
   
   y_right <- teat_diameter * (x_right - teat_placement) *
-    (x_right - (teat_roundness + teat_placement)) -
+    (x_right - (depth_of_medial + teat_placement)) -
     (udder_floor_height + teat_length)
   
   df <- rbind(
     data.frame(x = x_left,  y = y_left),
     data.frame(x = x_right, y = y_right)
   )
+}
+
+# creates a visualization of the teats based off input parameters
+teat_model <- function(teat_placement = 2.7, depth_of_medial = 0.15, 
+                       udder_floor_height = 13, teat_length = 1.4, 
+                       teat_diameter = 3.5, leg_width = 4.6,
+                       teat_length_score = NULL, teat_diameter_score = NULL, 
+                       teat_placement_score = NULL, score_as_input = FALSE,
+                       goat_size = "standard",
+                       n_points = 200) {
+  
+  if (score_as_input) {
+    if (anyNA(c(teat_length_score, teat_diameter_score, teat_placement_score))) {
+      stop("Score must be set as an input")
+    }
+    if (!is.numeric(c(teat_length_score, teat_diameter_score, 
+                      teat_placement_score))) {
+      stop("Input must be numeric")
+    }
+    
+    # calculate the goat measurements if scores are provided
+    teat_length <- score_to_teat_length(teat_length_score, goat_size)
+    teat_diameter <- score_to_teat_diameter(teat_diameter_score, goat_size)
+    teat_placement <- score_to_teat_placement(teat_placement_score, leg_width)
+    
+    # need to take depth of medial, udder floor height, and leg width as an input
+  }
+  
+  if (!is.numeric(c(teat_placement, depth_of_medial, udder_floor_height, teat_length, 
+                    teat_diameter, leg_width))) {
+    stop("Input must be numeric")
+  }
+
+  df <- teats_df(teat_placement, depth_of_medial, udder_floor_height, 
+                 teat_length, teat_diameter, leg_width, n_points)
   
   ggplot(df, aes(x = x, y = y)) +
     geom_line() +
     coord_fixed(xlim = c(-20, 20), ylim = c(-30, 10)) +
     theme_minimal()
 }
+
 # Closed polygon for both teats. The top boundary of each teat polygon follows
 # the medial curve (udder floor) so the teats connect seamlessly to the udder body.
 # The bottom boundary is the teat parabola.
-teats_polygon_df <- function(teat_placement, teat_roundness, udder_floor_height,
-                              teat_length, teat_diameter, leg_width,
-                              closeness_of_halves, depth_of_medial,
-                              n_points = 200) {
-
+teats_polygon_df <- function(teat_placement, depth_of_medial, udder_floor_height,
+                             teat_length, teat_diameter, leg_width, 
+                             closeness_of_halves, teat_length_score = NULL, 
+                             teat_diameter_score = NULL, 
+                             teat_placement_score = NULL, score_as_input = FALSE,
+                             goat_size = "standard", n_points = 200) {
+  if (score_as_input) {
+    if (anyNA(c(teat_length_score, teat_diameter_score, teat_placement_score))) {
+      stop("Score must be set as an input")
+    }
+    if (!is.numeric(c(teat_length_score, teat_diameter_score, 
+                      teat_placement_score))) {
+      stop("Input must be numeric")
+    }
+    
+    # calculate the goat measurements if scores are provided
+    teat_length <- score_to_teat_length(teat_length_score, goat_size)
+    teat_diameter <- score_to_teat_diameter(teat_diameter_score, goat_size)
+    teat_placement <- score_to_teat_placement(teat_placement_score, leg_width)
+    
+    # need to take depth of medial, udder floor height, and leg width as an input
+  }
+  
+  if (!is.numeric(c(teat_placement, depth_of_medial, udder_floor_height,
+                    teat_length, teat_diameter, leg_width, closeness_of_halves))) {
+    stop("Input must be numeric")
+  }
+  
   x_left  <- seq(-leg_width, 0, length.out = n_points)
   x_right <- seq(0, leg_width, length.out = n_points)
 
   # teat parabolas (bottom boundary)
   y_teat_left  <- teat_diameter * (x_left  + teat_placement) *
-                  (x_left  + (teat_roundness + teat_placement)) -
+                  (x_left  + (depth_of_medial + teat_placement)) -
                   (udder_floor_height + teat_length)
   y_teat_right <- teat_diameter * (x_right - teat_placement) *
-                  (x_right - (teat_roundness + teat_placement)) -
+                  (x_right - (depth_of_medial + teat_placement)) -
                   (udder_floor_height + teat_length)
 
   # medial curves (top boundary — the udder floor the teats hang from)
@@ -137,13 +190,83 @@ teats_polygon_df <- function(teat_placement, teat_roundness, udder_floor_height,
 }
 
 
+# Closed polygons for both teats built directly from physical measurements
+# (used by the score-driven flow). Each teat is a symmetric parabola whose
+# vertex sits at (+/- teat_x_center, medial(teat_x_center) - teat_length_in)
+# and which reaches teat_diameter_in wide at the medial-floor level. The
+# top of each polygon traces the medial curve over the teat's x-range so
+# the teat joins the udder cleanly.
+teats_polygon_from_measurements <- function(teat_x_center, teat_diameter_in,
+                                            teat_length_in,
+                                            udder_floor_height,
+                                            closeness_of_halves,
+                                            depth_of_medial,
+                                            n_points = 200) {
+
+  # default teat paraboula with the height and width of the teat length and diameter respectively                                              
+  teat_curvature <- 4 * teat_length_in / teat_diameter_in^2
+
+  build_side <- function(x_c, side) {
+    # building the x-range for the parabola and medial curve
+    x <- seq(x_c - (teat_diameter_in / 2), x_c + (teat_diameter_in / 2), length.out = n_points)
+
+    if (side == "r") {
+      # for the floor y-values, we need to evaluate the medial curve at the same x-values as the parabola. 
+      # The medial curve is defined as a parabola that opens upwards, with its vertex at (0, depth_of_medial - udder_floor_height). 
+      # The equation for the medial curve is:
+      floor_y <- depth_of_medial * (x - closeness_of_halves) *
+                 (x - (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+      base_y  <- depth_of_medial * (x_c - closeness_of_halves) *
+                 (x_c - (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+    } else {
+      floor_y <- depth_of_medial * (x + closeness_of_halves) *
+                 (x + (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+      base_y  <- depth_of_medial * (x_c + closeness_of_halves) *
+                 (x_c + (closeness_of_halves + 2)) +
+                 depth_of_medial - udder_floor_height
+    }
+
+    # the parabola equation is defined as y = a(x - h)^2 + k, where (h, k) is the vertex of the teat, so the bottom curve of the teat
+    parab_y <- teat_curvature * (x - x_c)^2 + base_y - teat_length_in # subtract the teat length to get the vertex at the correct height
+
+    # creating a mask to keep points where the parabola is below the medial curve (the udder floor)
+    # this ensures that when its rendered all together, the teats will be drawn below the udder floor and not intersect it
+    mask <- parab_y < floor_y
+    if (!any(mask)) {
+      return(data.frame(x = numeric(0), y = numeric(0), group = character(0)))
+    }
+    x       <- x[mask]
+    parab_y <- parab_y[mask]
+    floor_y <- floor_y[mask]
+
+    # combine into a closed polygon: parabola (bottom) out, floor (top) back.
+    data.frame(
+      x     = c(x, rev(x)),
+      y     = c(parab_y, rev(floor_y)),
+      group = paste0(side, "_teat")
+    )
+  }
+
+  rbind(
+    build_side( teat_x_center, "r"),
+    build_side(-teat_x_center, "l")
+  )
+}
+
+
 if (sys.nframe() == 0) {
   teat_model(
-    teat_placement     = 2.5,
-    teat_roundness     = 0.15,
-    udder_floor_height = 13,
-    teat_length        = 2,
-    teat_diameter      = 4.5,
-    leg_width = 4.3
+    depth_of_medial = 0.15, 
+    udder_floor_height = 13, 
+    leg_width = 4.6,
+    teat_length_score = 14, 
+    teat_diameter_score = 50, 
+    teat_placement_score = 31, 
+    score_as_input = TRUE
   )
+  
+  teat_model()
 }
