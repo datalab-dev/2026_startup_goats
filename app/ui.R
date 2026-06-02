@@ -260,7 +260,10 @@ ui <- fluidPage(
             "ggplot2-based graph that lets you put an image on the graph,",
             br(),
             "and translate, scale, or rotate the image."),
-        downloadButton("export_data", "Export Data", class = "btn-default")
+        div(style = "display: flex; gap: 8px;",
+            downloadButton("export_data", "Export Data", class = "btn-default"),
+            downloadButton("export_png",  "Export PNG",  class = "btn-default")
+        )
       ),
 
       plotOutput("goat_plot", height = "640px"),

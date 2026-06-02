@@ -203,6 +203,14 @@ server <- function(input, output, session) {
             input$img_opacity, format(input$zoom, nsmall = 1))
   })
 
+ # notification system for now, which will eventually be deleted/commented out 
+  observeEvent(input$calc_score, {
+    showNotification(
+      "Linear appraisal score calculation will be wired up to the trained model.",
+      type = "message", duration = 4)
+  })
+
+  # expporting score data in the UCD Goat Lab Approved Format.
   # CSV export uses the score inputs the user is currently looking at
   # (whether or not they've been locked in via Create Visual).
   # "Rear Udder Arch" stays in the schema (UCD Goat Lab format) but is
@@ -223,6 +231,55 @@ server <- function(input, output, session) {
         check.names = FALSE
       )
       write.csv(export_df, file, row.names = FALSE)
+    }
+  )
+  # exporting function for png 
+  output$export_png <- downloadHandler(
+    filename = function() {
+      sprintf("goat-plot-%s.png", format(Sys.time(), "%Y%m%d-%H%M%S"))
+    },
+    content = function(file) {
+      png(file, width = 1200, height = 900, res = 150)
+      
+      g <- ggplot() +
+        coord_fixed(xlim = c(-8, 8),
+                    ylim = c(view_bottom, view_top), expand = FALSE) +
+        theme_minimal() +
+        labs(x = "Horizontal position", y = "Vertical position")
+      
+      if (!is.null(input$goat_image)) {
+        raster <- goat_raster()
+        g <- g + annotation_raster(
+          raster,
+          xmin = (-8 - input$zoom)         + input$shift_x,
+          xmax = ( 8 + input$zoom)         + input$shift_x,
+          ymin = (view_bottom - input$zoom) + input$shift_y,
+          ymax = (view_top    + input$zoom) + input$shift_y
+        )
+      }
+      
+      print(g +
+              geom_polygon(data = teats_poly(),  aes(x, y, group = group),
+                           fill = "mediumpurple", color = "mediumpurple3",
+                           linewidth = 1, alpha = 0.31) +
+              geom_polygon(data = pelvic_poly(), aes(x, y, group = group),
+                           fill = "steelblue", color = "steelblue",
+                           linewidth = 1, alpha = 0.45) +
+              geom_polygon(data = body_poly(),   aes(x, y, group = group),
+                           fill = "salmon", color = "firebrick",
+                           linewidth = 1, alpha = 0.5) +
+              geom_polygon(data = legs_poly(),   aes(x, y, group = group),
+                           fill = "gray60", color = "black",
+                           linewidth = 0.4, alpha = 0.5) +
+              geom_segment(data = hock_midline(),
+                           aes(x = x, y = y, xend = xend, yend = yend),
+                           color = "black", linewidth = 0.6) +
+              geom_polygon(data = hocks_poly(), aes(x, y, group = side),
+                           fill = "gray40", color = "black",
+                           linewidth = 0.5) +
+              geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4))
+      
+      dev.off()
     }
   )
 }
