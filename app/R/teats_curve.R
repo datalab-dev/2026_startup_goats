@@ -17,7 +17,7 @@
 # leg_width = horizontal boundary for the plot x-range
 
 library(ggplot2)
-source("app/R/utils.R")
+source("./R/utils.R")
 
 # inches -> score 
 
