@@ -171,7 +171,7 @@ server <- function(input, output, session) {
             input$img_opacity, format(input$zoom, nsmall = 1))
   })
 
-  # notification system for now, which will eventually be deleted/commented out 
+ # notification system for now, which will eventually be deleted/commented out 
   observeEvent(input$calc_score, {
     showNotification(
       "Linear appraisal score calculation will be wired up to the trained model.",
@@ -197,7 +197,7 @@ server <- function(input, output, session) {
       write.csv(export_df, file, row.names = FALSE)
     }
   )
-  
+  # exporting function for png 
   output$export_png <- downloadHandler(
     filename = function() {
       sprintf("goat-plot-%s.png", format(Sys.time(), "%Y%m%d-%H%M%S"))
