@@ -317,6 +317,84 @@ ui <- fluidPage(
           br(),
           actionButton("calc_score", "Calculate Linear Appraisal Score",
                        class = "btn calc-btn")
+
+    # left side is the params control
+    column(width = 4,
+
+      div(class = "agheader",
+        div(
+          h1("Ag-GOAT", class = "agtitle"),
+          div(class = "agsub",
+              "Enter the 6 linear appraisal scores, hit ",
+              tags$b("Create Visual"),
+              ", then fine-tune hock, legs, and udder-arch attachment below.")
+        )
+      ),
+
+      actionButton("reset_all",
+                   HTML("&#x21bb; Reset all inputs"),
+                   class = "btn master-reset"),
+
+      section_card("Linear Appraisal Scores", "scores",
+        param_row("udder_depth_score",       "udder depth"),
+        param_row("rear_udder_height_score", "rear udder height"),
+        param_row("medial_score",            "medial ligament"),
+        param_row("teat_length_score",       "teat length"),
+        param_row("teat_diameter_score",     "teat diameter"),
+        param_row("teat_placement_score",    "teat placement")
+      ),
+
+      actionButton("create_visual", "Create Visual",
+                   class = "btn calc-btn"),
+
+      br(), br(),
+
+      section_card("Adjustable Parts", "adjustable",
+        param_row("hock_height",    "hock height"),
+        param_row("leg_width",      "leg width"),
+        param_row("arch_leg_y",     "arch leg y"),
+        param_row("arch_shape_pad", "arch roundness")
+      )
+    ),
+
+    # right side has the graph and image overlay controls 
+    column(width = 8,
+      div(class = "agheader",
+        div(class = "blurb",
+            "ggplot2-based graph that lets you put an image on the graph,",
+            br(),
+            "and translate, scale, or rotate the image."),
+        div(style = "display: flex; gap: 8px;",
+            downloadButton("export_data", "Export Data", class = "btn-default"),
+            downloadButton("export_png",  "Export PNG",  class = "btn-default")
+        )
+      ),
+
+      plotOutput("goat_plot", height = "640px"),
+
+      div(class = "image-card",
+        div(class = "section-title",
+            style = "color: #555;", "Image Overlay"),
+        fluidRow(
+          column(6,
+            fileInput("goat_image", "Upload or take a photo of the udder",
+                      accept = "image/*")
+          ),
+          column(6,
+            sliderInput("img_opacity", "image visibility",
+                        min = 0, max = 100, value = 70, step = 5,
+                        post = "%")
+          )
+        ),
+        fluidRow(
+          column(3, sliderInput("zoom", "zoom",
+                                min = -3, max = 5, value = 1.5, step = 0.1)),
+          column(3, sliderInput("shift_x",  "shift x",
+                                min = -10, max = 10, value = -0.5, step = 0.1)),
+          column(3, sliderInput("shift_y",  "shift y",
+                                min = -15, max = 15, value = -0.5, step = 0.1)),
+          column(3, sliderInput("rotation", "rotation (deg)",
+                                min = -180, max = 180, value = 0, step = 1))
         ),
     
         # right side has the graph and image overlay controls 
