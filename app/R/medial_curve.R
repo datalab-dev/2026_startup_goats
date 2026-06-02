@@ -80,6 +80,42 @@ generate_medial_curve <- function(udder_floor_height = 13,
     data.frame(x = x_left,  y = y_left),
     data.frame(x = x_right, y = y_right)
   )
+} # regenerated again
+
+# Left half of the medial curve (x from -leg_width to 0).
+# Mirrors Desmos: m(x) = q(x+p)(x+(p+2)) + q - o
+generate_left_curve <- function(udder_floor_height = 13, closeness_of_halves = 1,
+                                depth_of_medial = 0.15, leg_width = 4.6,
+                                n_points = 200) {
+  check_numeric_input(udder_floor_height)
+  check_numeric_input(closeness_of_halves)
+  check_numeric_input(depth_of_medial)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
+
+  x <- seq(-leg_width, 0, length.out = n_points)
+  y <- depth_of_medial * (x + closeness_of_halves) *
+       (x + (closeness_of_halves + 2)) +
+       depth_of_medial - udder_floor_height
+  data.frame(x = x, y = y)
+}
+
+# Right half of the medial curve (x from 0 to leg_width).
+# Mirrors Desmos: n(x) = q(x-p)(x-(p+2)) + q - o
+generate_right_curve <- function(udder_floor_height = 13, closeness_of_halves = 1,
+                                 depth_of_medial = 0.15, leg_width = 4.6,
+                                 n_points = 200) {
+  check_numeric_input(udder_floor_height)
+  check_numeric_input(closeness_of_halves)
+  check_numeric_input(depth_of_medial)
+  check_numeric_input(leg_width)
+  check_numeric_input(n_points)
+
+  x <- seq(0, leg_width, length.out = n_points)
+  y <- depth_of_medial * (x - closeness_of_halves) *
+       (x - (closeness_of_halves + 2)) +
+       depth_of_medial - udder_floor_height
+  data.frame(x = x, y = y)
 }
 
 # Closed polygon for the full udder body.
