@@ -216,9 +216,9 @@ ui <- fluidPage(
   fluidRow(
     column(12,
            div(style = "display:flex; justify-content:space-between; margin-bottom:10px;",
-               actionButton("nav_prev", "← Previous"),
-               actionButton("nav_next", "Next →")
-           )
+               uiOutput("prev_button"),
+               uiOutput("next_button")
+               )
     )
   ),
   
@@ -239,19 +239,27 @@ ui <- fluidPage(
              )
     ),
     
+    # get the goat database from the user
+    tabPanel("goat_database",
+             fluidRow(
+               column(12,
+                      h2("Upload goat database"),
+                      fileInput("goat_database", "Only .csv files accepted",
+                          accept = ".csv")
+               )
+             )
+    ),
+    
     # goat selection page    
     tabPanel("goat_selection",
              fluidRow(
                column(12,
                       h2("Select a Goat"),
                       
-                      fluidRow(
-                        column(6,
-                               textInput("owner_name_filter", "Owner Name filter")
-                        ),
-                        column(6,
-                               textInput("owner_id_filter", "Owner ID filter")
-                        )
+                      div(
+                        style = "width: 100%;",
+                        uiOutput("column_filter"),
+                        uiOutput("value")
                       ),
                       
                       actionButton("search_goats", "Search", 

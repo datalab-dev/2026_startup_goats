@@ -56,6 +56,3 @@ SECTION_PALETTE <- list(
   medial = list(light = "#ffd1c0", main = "#fa8072", dark = "#b22222", border = "#cc4444"),
   teats  = list(light = "#d8c5ed", main = "#9370db", dark = "#5d478b", border = "#7d5dbf")
 )
-
-# database containing goat information
-goat_database <- read.csv("./data/goat_database.csv", stringsAsFactors = FALSE, check.names = FALSE)
