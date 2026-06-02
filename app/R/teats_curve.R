@@ -19,6 +19,17 @@
 library(ggplot2)
 source("app/R/utils.R")
 
+# inches -> score 
+
+score_to_teat_length <- function(score, goat_size = "standard") {
+  if (goat_size == "standard") {
+    scales::rescale(score, to = c(0.5, 5.0), from = c(5, 50))
+  } else if (goat_size == "miniature") {
+    scales::rescale(score, to = c(0.25, 2.5), from = c(5, 50))
+  } else {
+    stop("goat_size must be 'standard' or 'miniature'")
+  }
+}
 
 #
 # functions to be used for making visualizations
