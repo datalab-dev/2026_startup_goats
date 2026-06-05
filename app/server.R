@@ -1,5 +1,4 @@
 server <- function(input, output, session) {
-  # HILARY"S CODE
   # page state to keep track of the current page
   page <- reactiveVal("user_information")
   
@@ -24,7 +23,7 @@ server <- function(input, output, session) {
                    nzchar(trimws(name)) &&
                      grepl(".+@.+\\..+", email) # regex to check proper email format
                  },
-                 "goat_database"  = !is.null(input$goat_database),
+                 "goat_database"  = !is.null(input$goat_database) && length(missing_cols()) == 0,
                  "goat_selection" = !is.null(selected_goat()),
                  "goat_visualizer" = FALSE   # last page
     )
@@ -55,6 +54,7 @@ server <- function(input, output, session) {
     # goat database must be uploaded
     else if(page() == "goat_database") {
       req(input$goat_database)
+      req(length(missing_cols()) == 0)   
       
       updateTabsetPanel(session, "page_tabs", selected = "goat_selection")
       page("goat_selection")
@@ -91,6 +91,12 @@ server <- function(input, output, session) {
   # store selected goat
   selected_goat <- reactiveVal(NULL)
   
+  # map the expected column name to the actual column name
+  goat_card_cols <- reactiveVal(NULL)
+  
+  # track the if the columns Animal ID, Animal Name, and Owner Name exist
+  missing_cols <- reactiveVal(character(0))
+  
   # read in the goat database when uploaded
   observeEvent(input$goat_database, {
     req(input$goat_database)
@@ -101,6 +107,18 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE,
         check.names      = FALSE  
       )
+      
+      required_cols <- c("Animal Id", "Animal Name", "Owner Name")
+      missing       <- setdiff(required_cols, names(df))
+      missing_cols(missing)
+      
+      # if the database has all the expected columns, set it in the mapping
+      if (length(missing) == 0) {
+        goat_card_cols(setNames(required_cols, required_cols))
+      } else {
+        goat_card_cols(NULL)
+      }
+      
       goat_data(df)
     }, error = function(e) {
       showNotification(
@@ -109,6 +127,79 @@ server <- function(input, output, session) {
       )
       goat_data(NULL)
     })
+  })
+  
+  # allows user to select columns that correspond to Animal Id, Animal Name,
+  # and Owner Name if those 3 specific columns do not exist
+  output$column_selection <- renderUI({
+    missing <- missing_cols()
+    goats      <- goat_data()
+    
+    if (length(missing) == 0 || is.null(goats)) return(NULL)
+    
+    col_choices <- names(goats)
+    
+    div(
+      style = "background:#fff3cd; border:1px solid #ffc107; border-radius:6px;
+             padding:14px; margin-top:12px;",
+      p(style = "font-weight:600; color:#856404; margin-bottom:10px;",
+        "Some expected columns weren't found. Please map your columns:"),
+      lapply(missing, function(col) {
+        input_id <- paste0("map_", gsub(" ", "_", col))
+        selectInput(
+          inputId  = input_id,
+          label    = HTML(paste0("Which column corresponds to <b>", col, "</b>?")),
+          choices  = c("— select —" = "", col_choices),
+          selected = "",
+          width    = "100%"
+        )
+      }),
+      actionButton("confirm_selection", "Confirm Selection",
+                   class = "btn btn-warning",
+                   style = "margin-top:8px; width:100%;")
+    )
+  })
+  
+  # apply the mapping when confirmed
+  observeEvent(input$confirm_selection, {
+    missing <- missing_cols()
+    df      <- goat_data()
+    
+    if (is.null(df) || length(missing) == 0) return()
+    
+    # collect selections
+    selections <- vapply(missing, function(col) {
+      input_id <- paste0("map_", gsub(" ", "_", col))
+      input[[input_id]] %||% ""
+    }, character(1))
+    
+    # all columns must be chosen
+    if (any(selections == "")) {
+      showNotification("Please select a column for every required field.",
+                       type = "warning", duration = 4)
+      return()
+    }
+    
+    # no duplicate selections allowed
+    if (anyDuplicated(selections)) {
+      showNotification("Each required field must map to a different column.",
+                       type = "warning", duration = 4)
+      return()
+    }
+    
+    required_cols <- c("Animal Id", "Animal Name", "Owner Name")
+    present       <- setdiff(required_cols, missing)
+    
+    # map the user selected columns to the expected columns
+    mapping <- c(
+      setNames(present,    present),     # column exists
+      setNames(selections, missing)      # user-mapped columns
+    )
+    
+    goat_card_cols(mapping)
+    missing_cols(character(0))
+    
+    showNotification("Column selection applied.", type = "message", duration = 3)
   })
   
   # filter by column
@@ -229,10 +320,12 @@ server <- function(input, output, session) {
     page_goats <- goats[start_i:end_i, , drop = FALSE]
     
     # build the goat cards
+    column <- goat_card_cols()
     goat_cards <- lapply(seq_len(nrow(page_goats)), function(i) {
-      goat_id    <- as.character(page_goats$`Animal Id`[i])
-      goat_name  <- page_goats$`Animal Name`[i]
-      owner_name <- page_goats$`Owner Name`[i]
+      goat_id    <- as.character(page_goats[[ column[["Animal Id"]]   ]][i])
+      goat_name  <- page_goats[[ column[["Animal Name"]] ]][i]
+      owner_name <- page_goats[[ column[["Owner Name"]]  ]][i]
+      
       is_selected <- identical(selected_goat(), goat_id)
       
       card_style <- if (is_selected) {
@@ -303,11 +396,11 @@ server <- function(input, output, session) {
     clicked_goat_id <- input$goat_card_click
     
     # look up the goat name
+    column <- goat_card_cols()
     database <- goat_data()
     goat <- if (!is.null(database)) {
-      match_row <- database[as.character(database$`Animal Id`) == clicked_goat_id, ]
-      if (nrow(match_row) > 0) match_row$`Animal Name`[1] else clicked_goat_id
-    } else {
+      match_row <- database[ as.character(database[[ column[["Animal Id"]] ]]) == clicked_goat_id, ]
+      if (nrow(match_row) > 0) match_row[[ column[["Animal Name"]] ]][1] else clicked_goat_id    } else {
       clicked_goat_id
     }
     
@@ -337,14 +430,12 @@ server <- function(input, output, session) {
   observeEvent(input$search_goats, {
     selected_goat(NULL)
   })
-
-
-  # RASH'S CODE
-
-  # +/- / reset / min / max badge wiring for every input in PARAM_DEFAULTS.
-  # The +/- buttons always nudge by 0.5 per the Ag-GOAT notes; numericInput's
-  # own `step` is the keyboard-arrow granularity. local() captures pid so the
-  # closures don't all see the last value of the loop variable.
+  
+  # incremental buttons for each param
+  # the +/- buttons always move by ±0.5 per the Ag-GOAT notes, regardless of
+  # the numericInput's own step (which is the granularity for keyboard arrows).
+  # local() captures each loop variable so the closures don't all see the
+  # last value of pid.
   for (param_id in names(PARAM_DEFAULTS)) {
     local({
       pid         <- param_id
@@ -352,16 +443,19 @@ server <- function(input, output, session) {
       bounds      <- PARAM_BOUNDS[[pid]]
 
       bump <- function(delta) {
-        new_val <- clamp_numeric(input[[pid]] + delta, bounds$min, bounds$max)
-        if (is.null(new_val)) return(invisible())
+        cur <- input[[pid]]
+        if (is.null(cur) || is.na(cur)) return(invisible())
+        new_val <- max(bounds$min, min(bounds$max, cur + delta))
         updateNumericInput(session, pid, value = new_val)
       }
 
-      observeEvent(input[[paste0(pid, "_plus")]],  { bump(1) })
-      observeEvent(input[[paste0(pid, "_minus")]], { bump(-1) })
+      observeEvent(input[[paste0(pid, "_plus")]],  { bump( 0.5) })
+      observeEvent(input[[paste0(pid, "_minus")]], { bump(-0.5) })
       observeEvent(input[[paste0(pid, "_reset")]], {
         updateNumericInput(session, pid, value = default_val)
       })
+
+    
       observeEvent(input[[paste0(pid, "_min_badge")]], {
         updateNumericInput(session, pid, value = bounds$min)
       })
@@ -369,87 +463,46 @@ server <- function(input, output, session) {
         updateNumericInput(session, pid, value = bounds$max)
       })
 
-      # clamp out-of-range typed values back into the allowed window and cap
-      # them at 2-dp. Only write back when the cleaned value actually differs,
-      # so we don't reset the cursor on every valid keystroke.
+      # if the user types a value outside the range, it snaps to the closest bound
+      # `ignoreInit` so the initial default doesn't fire this.
       observeEvent(input[[pid]], {
-        cleaned <- clamp_numeric(input[[pid]], bounds$min, bounds$max)
-        if (is.null(cleaned)) return()
-        if (!isTRUE(all.equal(cleaned, input[[pid]]))) {
-          updateNumericInput(session, pid, value = cleaned)
+        v <- input[[pid]]
+        if (is.null(v) || is.na(v)) return()
+        if (v < bounds$min) {
+          updateNumericInput(session, pid, value = bounds$min)
+        } else if (v > bounds$max) {
+          updateNumericInput(session, pid, value = bounds$max)
         }
       }, ignoreInit = TRUE)
     })
   }
 
-  # validation is split so the plot only invalidates on adjustable-param
-  # changes or a new lock-in. Reading score inputs here would re-trigger the
-  # renderPlot (and the white-out animation) on every score keystroke even
-  # though the scores aren't applied until Create Visual is clicked.
-  # is_valid_number() lives in R/utils.R.
-  adjustable_params_filled <- reactive({
-    all(vapply(names(ADJUSTABLE_DEFAULTS),
-               function(pid) is_valid_number(input[[pid]]),
-               logical(1)))
+  # check if all goat params are numbers 
+  all_params_filled <- reactive({
+    all(vapply(names(PARAM_DEFAULTS), function(pid) {
+      v <- input[[pid]]
+      !is.null(v) && length(v) == 1 && !is.na(v) && is.numeric(v)
+    }, logical(1)))
   })
 
-  locked_scores_filled <- reactive({
-    all(vapply(locked_scores(), is_valid_number, logical(1)))
-  })
-
+  # reset everything to defaul
   observeEvent(input$reset_all, {
     for (pid in names(PARAM_DEFAULTS)) {
       updateNumericInput(session, pid, value = PARAM_DEFAULTS[[pid]])
     }
   })
 
-  # lock the score inputs in when "Create Visual" is clicked. ignoreNULL = FALSE
-  # together with default ignoreInit = FALSE fires this once at startup using
-  # the param_row defaults, so the plot renders without requiring a click.
-  locked_scores <- eventReactive(input$create_visual, {
-    list(
-      udder_depth_score       = input$udder_depth_score,
-      rear_udder_height_score = input$rear_udder_height_score,
-      medial_score            = input$medial_score,
-      teat_length_score       = input$teat_length_score,
-      teat_diameter_score     = input$teat_diameter_score,
-      teat_placement_score    = input$teat_placement_score
-    )
-  }, ignoreNULL = FALSE)
-
-  # geometry = locked scores + live adjustable params. The validate() here
-  # catches the only score-independent failure mode: arch <-> leg intersection
-  # placed at or above the rear-udder-height-determined arch vertex, which
-  # would flip the inverse-sqrt arch.
-  geometry <- reactive({
-    s <- locked_scores()
-    arch_vertex_y <- -input$hock_height *
-                     (1 - score_to_rear_udder_height_pct(s$rear_udder_height_score))
-    validate(need(
-      input$arch_leg_y < arch_vertex_y,
-      sprintf("Arch leg y (%.1f) must sit below the udder arch vertex (%.2f). Lower the slider, raise the hock, or bump the rear udder height score.",
-              input$arch_leg_y, arch_vertex_y)
-    ))
-    scores_to_geometry(
-      scores         = s,
-      hock_height    = input$hock_height,
-      leg_width      = input$leg_width,
-      arch_leg_y     = input$arch_leg_y,
-      arch_shape_pad = input$arch_shape_pad
-    )
-  })
-
-
-  # NEW FUCNTION, takes geometrical inch measurement from the linear scores
+  # define react-like polygons
   teats_poly <- reactive({
-    g <- geometry()
-    teats_polygon_from_measurements(
-      teat_x_center       = g$teat_x_center,
-      teat_diameter_in    = g$teat_diameter_in,
-      teat_length_in      = g$teat_length_in,
-      udder_floor_height  = g$udder_floor_height,
-      closeness_of_halves = g$closeness_of_halves,
-      depth_of_medial     = g$depth_of_medial
+    teats_polygon_df(
+      teat_placement  = input$teat_placement,
+      teat_roundness = input$depth_of_medial,
+      udder_floor_height  = input$udder_floor_height,
+      teat_length = input$teat_length,
+      teat_diameter = input$teat_diameter,
+      leg_width = input$leg_width,
+      closeness_of_halves = input$closeness_of_halves,
+      depth_of_medial = input$depth_of_medial
     )
   })
 
@@ -472,19 +525,20 @@ server <- function(input, output, session) {
   })
 
   body_poly <- reactive({
-    g <- geometry()
+    validate(need(input$arch_shape > input$leg_width,
+                  "Arch shape must be greater than leg width."))
     body_polygon_df(
-      udder_floor_height  = g$udder_floor_height,
-      closeness_of_halves = g$closeness_of_halves,
-      depth_of_medial     = g$depth_of_medial,
-      arch_roundness      = g$arch_roundness,
-      arch_height         = g$arch_height,
-      arch_shape          = g$arch_shape,
-      leg_width           = g$leg_width
+      udder_floor_height  = input$udder_floor_height,
+      closeness_of_halves = input$closeness_of_halves,
+      depth_of_medial = input$depth_of_medial,
+      arch_roundness = input$arch_roundness,
+      arch_height = input$arch_height,
+      arch_shape = input$arch_shape,
+      leg_width = input$leg_width
     )
   })
 
-  # Image overlay handler (unchanged)
+  # image overlay handler
   goat_raster <- reactive({
     req(input$goat_image)
     img <- magick::image_read(input$goat_image$datapath)
@@ -494,9 +548,10 @@ server <- function(input, output, session) {
     as.raster(img)
   })
 
+  # plotting the graph 
   output$goat_plot <- renderPlot({
-    validate(need(adjustable_params_filled() && locked_scores_filled(),
-                  "Please fill out every input with a number."))
+    validate(need(all_params_filled(),
+                  "please fill out all values with numbers"))
 
     g <- ggplot() +
       coord_fixed(xlim = c(-8, 8),
@@ -510,8 +565,8 @@ server <- function(input, output, session) {
       raster <- goat_raster()
       g <- g + annotation_raster(
         raster,
-        xmin = (-8 - input$zoom)          + input$shift_x,
-        xmax = ( 8 + input$zoom)          + input$shift_x,
+        xmin = (-8 - input$zoom)         + input$shift_x,
+        xmax = ( 8 + input$zoom)         + input$shift_x,
         ymin = (view_bottom - input$zoom) + input$shift_y,
         ymax = (view_top    + input$zoom) + input$shift_y
       )
@@ -530,9 +585,12 @@ server <- function(input, output, session) {
       geom_polygon(data = legs_poly(),   aes(x, y, group = group),
                    fill = "gray60", color = "black",
                    linewidth = 0.4, alpha = 0.5) +
+      # Hock midline (drawn before the knee circle so the circle outline
+      # covers the segment edges).
       geom_segment(data = hock_midline(),
                    aes(x = x, y = y, xend = xend, yend = yend),
                    color = "black", linewidth = 0.6) +
+      # Knee circles on top of the legs polygon.
       geom_polygon(data = hocks_poly(), aes(x, y, group = side),
                    fill = "gray40", color = "black",
                    linewidth = 0.5) +
@@ -544,7 +602,7 @@ server <- function(input, output, session) {
             input$img_opacity, format(input$zoom, nsmall = 1))
   })
 
- # notification system for now, which will eventually be deleted/commented out 
+  # notification system for now, which will eventually be deleted/commented out 
   observeEvent(input$calc_score, {
     showNotification(
       "Linear appraisal score calculation will be wired up to the trained model.",
@@ -552,75 +610,22 @@ server <- function(input, output, session) {
   })
 
   # expporting score data in the UCD Goat Lab Approved Format.
-  # CSV export uses the score inputs the user is currently looking at
-  # (whether or not they've been locked in via Create Visual).
-  # "Rear Udder Arch" stays in the schema (UCD Goat Lab format) but is
-  # left blank since it isn't one of the 6 scores driving the visual.
   output$export_data <- downloadHandler(
     filename = function() {
       sprintf("goat_traits-%s.csv", format(Sys.time(), "%Y%m%d-%H%M%S"))
     },
+    # REPLACE LATER !!!!!!!!
     content = function(file) {
       export_df <- data.frame(
-        "UdderDepth"                 = input$udder_depth_score,
-        "Rear Udder Height"          = input$rear_udder_height_score,
-        "Rear Udder Arch"            = NA,
-        "Medial Suspensory Ligament" = input$medial_score,
-        "Teat Placement"             = input$teat_placement_score,
-        "Teat Diameter"              = input$teat_diameter_score,
-        "Teat Length"                = input$teat_length_score,
-        check.names = FALSE
+        "UdderDepth"                 = 0,
+        "Rear Udder Height"          = 0,
+        "Rear Udder Arch"            = 0,
+        "Medial Suspensory Ligament" = 0,
+        "Teat Placement"             = 0,
+        "Teat Diameter"              = 0,
+        "Teat Length"                = 0
       )
       write.csv(export_df, file, row.names = FALSE)
-    }
-  )
-  # exporting function for png 
-  output$export_png <- downloadHandler(
-    filename = function() {
-      sprintf("goat-plot-%s.png", format(Sys.time(), "%Y%m%d-%H%M%S"))
-    },
-    content = function(file) {
-      png(file, width = 1200, height = 900, res = 150)
-      
-      g <- ggplot() +
-        coord_fixed(xlim = c(-8, 8),
-                    ylim = c(view_bottom, view_top), expand = FALSE) +
-        theme_minimal() +
-        labs(x = "Horizontal position", y = "Vertical position")
-      
-      if (!is.null(input$goat_image)) {
-        raster <- goat_raster()
-        g <- g + annotation_raster(
-          raster,
-          xmin = (-8 - input$zoom)         + input$shift_x,
-          xmax = ( 8 + input$zoom)         + input$shift_x,
-          ymin = (view_bottom - input$zoom) + input$shift_y,
-          ymax = (view_top    + input$zoom) + input$shift_y
-        )
-      }
-      
-      print(g +
-              geom_polygon(data = teats_poly(),  aes(x, y, group = group),
-                           fill = "mediumpurple", color = "mediumpurple3",
-                           linewidth = 1, alpha = 0.31) +
-              geom_polygon(data = pelvic_poly(), aes(x, y, group = group),
-                           fill = "steelblue", color = "steelblue",
-                           linewidth = 1, alpha = 0.45) +
-              geom_polygon(data = body_poly(),   aes(x, y, group = group),
-                           fill = "salmon", color = "firebrick",
-                           linewidth = 1, alpha = 0.5) +
-              geom_polygon(data = legs_poly(),   aes(x, y, group = group),
-                           fill = "gray60", color = "black",
-                           linewidth = 0.4, alpha = 0.5) +
-              geom_segment(data = hock_midline(),
-                           aes(x = x, y = y, xend = xend, yend = yend),
-                           color = "black", linewidth = 0.6) +
-              geom_polygon(data = hocks_poly(), aes(x, y, group = side),
-                           fill = "gray40", color = "black",
-                           linewidth = 0.5) +
-              geom_point(aes(x = 0, y = 0), color = "steelblue", size = 4))
-      
-      dev.off()
     }
   )
 }
