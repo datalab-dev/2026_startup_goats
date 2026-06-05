@@ -1,4 +1,345 @@
 server <- function(input, output, session) {
+  # HILARY"S CODE
+  # page state to keep track of the current page
+  page <- reactiveVal("user_information")
+  
+  # enabling/disabling button logic
+  # previous button
+  output$prev_button <- renderUI({
+    # disabled on the first page
+    if (page() == "user_information") {
+      tags$button("← Previous", class = "btn btn-default", disabled = NA)
+    } else {
+      actionButton("nav_prev", "← Previous")
+    }
+  })
+  
+  # next button
+  output$next_button <- renderUI({
+    ok <- switch(page(),
+                 # only allowed when required inputs are entered
+                 "user_information" = {
+                   name  <- input$user_name  %||% ""
+                   email <- input$user_email %||% ""
+                   nzchar(trimws(name)) &&
+                     grepl(".+@.+\\..+", email) # regex to check proper email format
+                 },
+                 "goat_database"  = !is.null(input$goat_database),
+                 "goat_selection" = !is.null(selected_goat()),
+                 "goat_visualizer" = FALSE   # last page
+    )
+    
+    if (ok) {
+      actionButton("nav_next", "Next →")
+    } else {
+      tags$button("Next →", class = "btn btn-default", disabled = NA)
+    }
+  })
+  
+  # next button logic
+  observeEvent(input$nav_next, {
+    # name and email must be entered
+    if (page() == "user_information") {
+      req(input$user_name, input$user_email)
+      
+      validate(
+        need(
+          grepl(".+@.+\\..+", input$user_email), 
+          "Please enter a valid email address"
+        )
+      )
+      
+      updateTabsetPanel(session, "page_tabs", selected = "goat_database")
+      page("goat_database")
+    }
+    # goat database must be uploaded
+    else if(page() == "goat_database") {
+      req(input$goat_database)
+      
+      updateTabsetPanel(session, "page_tabs", selected = "goat_selection")
+      page("goat_selection")
+    }
+    # goat must be selected
+    else if (page() == "goat_selection") {
+      req(input$goat_card_click)
+      
+      updateTabsetPanel(session, "page_tabs", selected = "goat_visualizer")
+      page("goat_visualizer")
+    }
+  })
+    
+  # previous button logic
+  observeEvent(input$nav_prev, {
+    if (page() == "goat_database") {
+      updateTabsetPanel(session, "page_tabs", selected = "user_information")
+      page("user_information")
+    }
+    else if (page() == "goat_selection") {
+      updateTabsetPanel(session, "page_tabs", selected = "goat_database")
+      page("goat_database")
+    }
+    
+    else if (page() == "goat_visualizer") {
+      updateTabsetPanel(session, "page_tabs", selected = "goat_selection")
+      page("goat_selection")
+    }
+  })
+  
+  # store the goat database
+  goat_data <- reactiveVal(NULL)
+  
+  # store selected goat
+  selected_goat <- reactiveVal(NULL)
+  
+  # read in the goat database when uploaded
+  observeEvent(input$goat_database, {
+    req(input$goat_database)
+    
+    tryCatch({
+      df <- read.csv(
+        input$goat_database$datapath,
+        stringsAsFactors = FALSE,
+        check.names      = FALSE  
+      )
+      goat_data(df)
+    }, error = function(e) {
+      showNotification(
+        paste("Failed to read CSV:", e$message),
+        type = "error", duration = 5
+      )
+      goat_data(NULL)
+    })
+  })
+  
+  # filter by column
+  output$column_filter <- renderUI({
+    goats <- goat_data()
+    
+    # no data, placeholder message
+    if (is.null(goats)) {
+      return(p(style = "color:#888; font-style:italic;",
+               "Upload a goat database to search."))
+    }
+    
+    # select what to filter by
+    col_choices <- c("None" = "", names(goats))
+    
+    selectInput(
+      "filter_column",
+      label    = "Filter by",
+      choices  = col_choices,
+      selected = "",
+      width    = "100%"
+    )
+  })
+  
+  # show the input text"box only when a filter is selected
+  output$value <- renderUI({
+    if (is.null(input$filter_column) || input$filter_column == "") {
+      return(NULL)
+    }
+    
+    textInput(
+      "filter_value",
+      label       = paste("Search in:", input$filter_column),
+      placeholder = paste0("Type to filter by ", input$filter_column,
+                           " (leave blank for all)"),
+      width    = "100%"
+    )
+  })
+  
+  # run search only when button is clicked
+  filtered_goats <- eventReactive(input$search_goats, {
+    goats <- goat_data()
+    
+    if (is.null(goats)) return(NULL)
+    
+    col   <- isolate(input$filter_column %||% "")
+    value <- trimws(isolate(input$filter_value) %||% "")
+    
+    # return all if searching for all
+    if (!nzchar(col) || !nzchar(value)) {
+      return(goats)
+    }
+    
+    # column must exist
+    if (!col %in% names(goats)) return(goats)
+    
+    # case-insensitive substring match on the chosen column
+    matches <- grepl(
+      pattern = tolower(value),
+      x       = tolower(as.character(goats[[col]])),
+      fixed   = TRUE
+    )
+    
+    goats[matches, , drop = FALSE]
+    
+  }, ignoreNULL = FALSE)
+  
+  # saves the goat search page result number
+  results_page <- reactiveVal(1)
+  
+  # reset the page number to 1 when search is ran
+  observeEvent(input$search_goats, {
+    results_page(1)
+    selected_goat(NULL)
+  })
+  
+  # go to the previous search result page
+  observeEvent(input$results_prev_page, {
+    results_page(max(1, results_page() - 1))
+  })
+  
+  # go to the next search result page
+  observeEvent(input$results_next_page, {
+    goats <- filtered_goats()
+    if (is.null(goats)) return()
+    max_page <- ceiling(nrow(goats) / 10)
+    results_page(min(max_page, results_page() + 1))
+  })
+  
+  # display goat results after search
+  output$goat_results <- renderUI({
+    goats <- filtered_goats()
+    df    <- goat_data()
+    
+    if (is.null(df)) {
+      return(div(
+        style = "padding:20px; background:#f8d7da; border:1px solid #dc3545; border-radius:5px;",
+        p(style = "margin:0; color:#721c24;", "Error: no goat database loaded.")
+      ))
+    }
+    
+    if (is.null(goats) || nrow(goats) == 0) {
+      return(div(
+        style = "padding:20px; background:#fff3cd; border:1px solid #ffc107; border-radius:5px;",
+        p(style = "margin:0; color:#856404;", "No goats found matching your search criteria.")
+      ))
+    }
+    
+    # pagination match
+    items_per_page <- 10
+    total_items    <- nrow(goats)
+    total_pages    <- ceiling(total_items / items_per_page)
+    cur_page       <- min(results_page(), total_pages)   
+    
+    start_i <- (cur_page - 1) * items_per_page + 1
+    end_i   <- min(cur_page * items_per_page, total_items)
+    
+    page_goats <- goats[start_i:end_i, , drop = FALSE]
+    
+    # build the goat cards
+    goat_cards <- lapply(seq_len(nrow(page_goats)), function(i) {
+      goat_id    <- as.character(page_goats$`Animal Id`[i])
+      goat_name  <- page_goats$`Animal Name`[i]
+      owner_name <- page_goats$`Owner Name`[i]
+      is_selected <- identical(selected_goat(), goat_id)
+      
+      card_style <- if (is_selected) {
+        "background:#d9d9d9; border:2px solid #888; border-radius:8px;
+       padding:12px; margin-bottom:10px; cursor:pointer; opacity:0.7;"
+      } else {
+        "background:white; border:2px solid #559FD9; border-radius:8px;
+       padding:12px; margin-bottom:10px; cursor:pointer;"
+      }
+      
+      div(
+        style      = card_style,
+        onmouseover = if (!is_selected) "this.style.background='#eef5fc';" else NULL,
+        onmouseout  = if (!is_selected) "this.style.background='white';"   else NULL,
+        onclick     = sprintf(
+          "Shiny.setInputValue('goat_card_click','%s',{priority:'event'});",
+          goat_id
+        ),
+        div(style = "font-weight:700; font-size:16px; color:#559FD9; margin-bottom:4px;",
+            goat_name),
+        div(style = "font-size:14px; color:#666;",
+            sprintf("ID: %s", goat_id)),
+        div(style = "font-size:13px; color:#888; margin-top:4px;",
+            sprintf("Owner: %s", owner_name))
+      )
+    })
+    
+    # pagination controls
+    prev_btn <- if (cur_page > 1) {
+      actionButton("results_prev_page", "← Prev",
+                   style = "margin-right:8px;")
+    } else {
+      tags$button("← Prev", class = "btn btn-default",
+                  disabled = NA, style = "margin-right:8px;")
+    }
+    
+    next_btn <- if (cur_page < total_pages) {
+      actionButton("results_next_page", "Next →")
+    } else {
+      tags$button("Next →", class = "btn btn-default", disabled = NA)
+    }
+    
+    # pagination control
+    pagination <- div(
+      style = "display:flex; align-items:center; justify-content:center; gap:8px; margin:12px 0;",
+      prev_btn,
+      span(style = "font-size:13px; color:#555;",
+           sprintf("Page %d of %d", cur_page, total_pages)),
+      next_btn
+    )
+    
+    # display the controls at the top and bottom of the search results
+    div(
+      div(style = "margin-bottom:10px; color:#666; font-size:14px;",
+          sprintf("Showing %d–%d of %d goat%s",
+                  start_i, end_i, total_items,
+                  if (total_items == 1) "" else "s")),
+      
+      pagination,              
+      do.call(tagList, goat_cards),
+      pagination              
+    )
+    
+  })
+  
+  # handle goat card clicks
+  observeEvent(input$goat_card_click, {
+    clicked_goat_id <- input$goat_card_click
+    
+    # look up the goat name
+    database <- goat_data()
+    goat <- if (!is.null(database)) {
+      match_row <- database[as.character(database$`Animal Id`) == clicked_goat_id, ]
+      if (nrow(match_row) > 0) match_row$`Animal Name`[1] else clicked_goat_id
+    } else {
+      clicked_goat_id
+    }
+    
+    # toggle selection
+    if (identical(selected_goat(), clicked_goat_id)) {
+      selected_goat(NULL)
+      
+      showNotification(
+        sprintf("Deselected: %s", goat),
+        type = "warning",
+        duration = 2
+      )
+      
+    } else {
+      
+      selected_goat(clicked_goat_id)
+      
+      showNotification(
+        sprintf("Selected: %s", goat),
+        type = "message",
+        duration = 2
+      )
+    }
+  })
+  
+  # clear the selected goat when a new search occurs
+  observeEvent(input$search_goats, {
+    selected_goat(NULL)
+  })
+
+
+  # RASH'S CODE
 
   # +/- / reset / min / max badge wiring for every input in PARAM_DEFAULTS.
   # The +/- buttons always nudge by 0.5 per the Ag-GOAT notes; numericInput's
