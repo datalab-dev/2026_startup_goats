@@ -114,7 +114,7 @@ This project is developed in R and uses a Shiny-based interface.
 
 Required packages:
 
-`install.packages(c("tidyverse", "shiny", "magick", "shinylive"))`
+`install.packages(c("ggplot2", "shiny", "shinylive", "magick", "dyplyr"))`
 
 
 ## Data Organisation
@@ -125,43 +125,72 @@ Required packages:
 
 ```
 data/                         
-├── Goat Pictures/                                 Images with scale reference (ruler) 
-├── rear udder image library/                      Rear-view udder images
-├──2025 LA Data_Cleaned.xlsx                       Cleaned linear appraisal dataset with goat trait scores and standardized variables for analysis and modeling  
-└──2025 LA Data_Uncleaned.xlsx                     Raw linear appraisal dataset containing original recorded trait scores and animal information                      Images of miniature goats taken from rear 
+├── Goat Pictures/                                 		   Images with scale reference (ruler) 
+│   ├── rear udder trait scores        					   Google sheets file, including sample linear appraisal scores to calibrate web app 
+├── rear udder image library/                      		   Rear-view udder images
+├── [STUDENT] - Data Export Format 				 		   Sample data export format    
+├── 2025 LA Data_Cleaned.xlsx                       		   Cleaned linear appraisal dataset with goat trait scores and standardized variables for analysis and modeling  
+├── 2025 LA Data_Uncleaned.xlsx                     	   	   Raw linear appraisal dataset containing original recorded trait scores and animal information                      
+└── goat_database.csv 
+final report draft & reviews/
+├── ava_wren_review.docx						   	       Student peer-review on final report draft
+├── goat_sabrina_cheung copy.docx				  		   Student peer-review on final report draft
+├── wk08_final_report_template.docx						   Project final report draft
+└── wk08_Yiwei_Zheng_goat.docx							   Student peer-review on final report draft
 scoping_documentation/
-├── Linear Modeling Tool Grant_DataLab_2026.docx   Project proposal outlining goals, methods, and planned development
-├── Scoping Meeting Notes                          Notes from initial project discussions and planning meetings
-└── scoping_document.docx                          Formal project scope, roles, responsibilities, and deliverables
-2025Linear-SOPDraft1.pdf                           Documentation of ADGA Linear Appraisal traits and scoring system  
-Data Inventory                                     Metadata table describing datasets used in the project, including size, source, and structure  
-GOAT Readme.md                                     Overview of the project and objectives  
-Linear 2025.pptx                                   Data analysis and visualizations of 2025 appraisal scores, including trait distributions and inter-appraiser variability  
-Meeting Notes                                      Notes from meetings with project lead and principal investigators  
-Student Meeting Notes                              Notes from internal student team meetings  
+├── Linear Modeling Tool Grant_DataLab_2026.docx  		   Project proposal outlining goals, methods, and planned development
+├── Scoping Meeting Notes                        		   Notes from initial project discussions and planning meetings
+└── scoping_document.docx                        		   Formal project scope, roles, responsibilities, and deliverables
+student_documents/
+├── linear score tables 								   Document detailing measurement values against corresponding linear appraisal scores
+├── Meeting Notes                             		       Notes from meetings with project lead and principal investigators  
+├── Readme First Draft 							  		   Initial draft of project readme  
+└── Student Meeting Notes                        		   Notes from internal student team meetings  
+2025Linear-SOPDraft1.pdf                      		       Documentation of ADGA Linear Appraisal traits and scoring system  
+Appenate – Linear Appraisal Data Gathering Presentation    Supplemental information on how appraisers use Appenate to enter and submit linear appraisal data.
+Data Inventory                                		       Metadata table describing datasets used in the project, including size, source, and structure  
+goat_final_presentation									   Final class presentation, including project background, outcomes, recommendations, and reflections.
+goat_final_report 										   Final written report describing the project background, prototype outcomes, discussion, limitations, and recommendations.
+Linear 2025.pptx                                		   Data analysis and visualizations of 2025 appraisal scores, including trait distributions and inter-appraiser variability  
+
 ```
 
 ### Github Repository Structure
 ```
-R/                              R source code
-├── data_cleaning.R             Data preprocessing
-├── leg_curve.R                 Function: rear leg / hock reference (used for proportional scoring)
-├── pelvic_curve.R              Function: pelvic arch reference (anchor for udder traits)
-├── udder_curve.R               Function: udder shape (height, depth, arch)
-├── medial_curve.R              Function: medial suspensory ligament (udder support)
-├── teats_curve.R               Function: teat placement and length (rear view)
-└── ui_teats.R                  Prototype Shiny UI for testing visualization
-data/                           Will contain rear udder reference images for input parameterization
-docs/                           Supporting documents
-├── team_agreement.md           Team workflow guidelines and collaboration expectations
-└── README_TEATS.md 
+app/                              R source code
+├── R/                            R functions
+│   ├── data_cleaning.R           Data preprocessing
+│   ├── leg_curve.R               Function: rear leg / hock reference (used for proportional scoring)
+│   ├── medial_curve.R            Function: medial suspensory ligament (udder support)
+│   ├── pelvic_curve.R            Function: pelvic arch reference (anchor for udder traits)
+│   ├── score.R                   Function: trait scoring logic
+│   ├── score_geometry.R          Function: geometric calculations for scoring
+│   ├── teats_curve.R             Function: teat placement and length (rear view)
+│   ├── udder_curve.R             Function: udder shape (height, depth, arch)
+│   ├── ui_helpers.R              UI utility functions
+│   ├── ui_teats.R                Prototype Shiny UI for testing visualization
+│   └── utils.R                   Shared utility functions
+├── app.R                         App entry point
+├── global.R                      Global variables and dependencies
+├── server.R                      Shiny server logic
+└── ui.R                          Shiny UI layout
+parameterization
+docs/                             Supporting documents
+├── Goat-Project-Report.pdf       Final written report describing the project background, discussion, limitations, and recommendations
+├── README_TEATS.md               
+├── dummyDataClean.csv            Sample cleaned dataset for development and testing
+├── goat_data_dictionary.xlsx     Reference document describing datasets, variables, trait abbreviations, and source information
+├── team_agreement.md             Team workflow guidelines and collaboration expectations
+└── userChangeable Points.png     Diagram of user-adjustable scoring parameters
 images/
-├── Ag-GOAT Figma.png           UI design prototype
-├── goat_workflow.png           Diagram showing how project scripts and application components connect
-├── goat_timeline_workflow.png  Visual timeline of project development stages and milestones
-└── teat_placement.png          ADGA diagram showing teat placement scoring scale
-.gitignore                      Paths Git should ignore
-README.md                       This file
+├── 325RU.HEIC                    
+├── Ag-GOAT_Figma.png             UI design prototype
+├── Ag-GOAT_Week7Progress.png     Week 7 progress snapshot
+├── goat_timeline_workflow.png    Visual timeline of project development stages and milestones
+├── goat_workflow.png             Diagram showing how project scripts and application components connect
+└── teat_placement.png            ADGA diagram showing teat placement scoring scale
+.gitignore                        Paths Git should ignore
+README.md                         This file
 ```
 
 ### API Documentation
