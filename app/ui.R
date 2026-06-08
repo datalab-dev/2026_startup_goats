@@ -245,7 +245,8 @@ ui <- fluidPage(
                column(12,
                       h2("Upload goat database"),
                       fileInput("goat_database", "Only .csv files accepted",
-                          accept = ".csv")
+                          accept = ".csv"),
+                      uiOutput("column_selection")   
                )
              )
     ),

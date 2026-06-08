@@ -24,7 +24,7 @@ server <- function(input, output, session) {
                    nzchar(trimws(name)) &&
                      grepl(".+@.+\\..+", email) # regex to check proper email format
                  },
-                 "goat_database"  = !is.null(input$goat_database),
+                 "goat_database"  = !is.null(input$goat_database) && length(missing_cols()) == 0,
                  "goat_selection" = !is.null(selected_goat()),
                  "goat_visualizer" = FALSE   # last page
     )
@@ -55,6 +55,7 @@ server <- function(input, output, session) {
     # goat database must be uploaded
     else if(page() == "goat_database") {
       req(input$goat_database)
+      req(length(missing_cols()) == 0)   
       
       updateTabsetPanel(session, "page_tabs", selected = "goat_selection")
       page("goat_selection")
@@ -91,6 +92,12 @@ server <- function(input, output, session) {
   # store selected goat
   selected_goat <- reactiveVal(NULL)
   
+  # map the expected column name to the actual column name
+  goat_card_cols <- reactiveVal(NULL)
+  
+  # track the if the columns Animal ID, Animal Name, and Owner Name exist
+  missing_cols <- reactiveVal(character(0))
+  
   # read in the goat database when uploaded
   observeEvent(input$goat_database, {
     req(input$goat_database)
@@ -101,6 +108,18 @@ server <- function(input, output, session) {
         stringsAsFactors = FALSE,
         check.names      = FALSE  
       )
+      
+      required_cols <- c("Animal Id", "Animal Name", "Owner Name")
+      missing       <- setdiff(required_cols, names(df))
+      missing_cols(missing)
+      
+      # if the database has all the expected columns, set it in the mapping
+      if (length(missing) == 0) {
+        goat_card_cols(setNames(required_cols, required_cols))
+      } else {
+        goat_card_cols(NULL)
+      }
+      
       goat_data(df)
     }, error = function(e) {
       showNotification(
@@ -109,6 +128,79 @@ server <- function(input, output, session) {
       )
       goat_data(NULL)
     })
+  })
+  
+  # allows user to select columns that correspond to Animal Id, Animal Name,
+  # and Owner Name if those 3 specific columns do not exist
+  output$column_selection <- renderUI({
+    missing <- missing_cols()
+    goats      <- goat_data()
+    
+    if (length(missing) == 0 || is.null(goats)) return(NULL)
+    
+    col_choices <- names(goats)
+    
+    div(
+      style = "background:#fff3cd; border:1px solid #ffc107; border-radius:6px;
+             padding:14px; margin-top:12px;",
+      p(style = "font-weight:600; color:#856404; margin-bottom:10px;",
+        "Some expected columns weren't found. Please map your columns:"),
+      lapply(missing, function(col) {
+        input_id <- paste0("map_", gsub(" ", "_", col))
+        selectInput(
+          inputId  = input_id,
+          label    = HTML(paste0("Which column corresponds to <b>", col, "</b>?")),
+          choices  = c("— select —" = "", col_choices),
+          selected = "",
+          width    = "100%"
+        )
+      }),
+      actionButton("confirm_selection", "Confirm Selection",
+                   class = "btn btn-warning",
+                   style = "margin-top:8px; width:100%;")
+    )
+  })
+  
+  # apply the mapping when confirmed
+  observeEvent(input$confirm_selection, {
+    missing <- missing_cols()
+    df      <- goat_data()
+    
+    if (is.null(df) || length(missing) == 0) return()
+    
+    # collect selections
+    selections <- vapply(missing, function(col) {
+      input_id <- paste0("map_", gsub(" ", "_", col))
+      input[[input_id]] %||% ""
+    }, character(1))
+    
+    # all columns must be chosen
+    if (any(selections == "")) {
+      showNotification("Please select a column for every required field.",
+                       type = "warning", duration = 4)
+      return()
+    }
+    
+    # no duplicate selections allowed
+    if (anyDuplicated(selections)) {
+      showNotification("Each required field must map to a different column.",
+                       type = "warning", duration = 4)
+      return()
+    }
+    
+    required_cols <- c("Animal Id", "Animal Name", "Owner Name")
+    present       <- setdiff(required_cols, missing)
+    
+    # map the user selected columns to the expected columns
+    mapping <- c(
+      setNames(present,    present),     # column exists
+      setNames(selections, missing)      # user-mapped columns
+    )
+    
+    goat_card_cols(mapping)
+    missing_cols(character(0))
+    
+    showNotification("Column selection applied.", type = "message", duration = 3)
   })
   
   # filter by column
@@ -229,10 +321,12 @@ server <- function(input, output, session) {
     page_goats <- goats[start_i:end_i, , drop = FALSE]
     
     # build the goat cards
+    column <- goat_card_cols()
     goat_cards <- lapply(seq_len(nrow(page_goats)), function(i) {
-      goat_id    <- as.character(page_goats$`Animal Id`[i])
-      goat_name  <- page_goats$`Animal Name`[i]
-      owner_name <- page_goats$`Owner Name`[i]
+      goat_id    <- as.character(page_goats[[ column[["Animal Id"]]   ]][i])
+      goat_name  <- page_goats[[ column[["Animal Name"]] ]][i]
+      owner_name <- page_goats[[ column[["Owner Name"]]  ]][i]
+      
       is_selected <- identical(selected_goat(), goat_id)
       
       card_style <- if (is_selected) {
@@ -303,11 +397,11 @@ server <- function(input, output, session) {
     clicked_goat_id <- input$goat_card_click
     
     # look up the goat name
+    column <- goat_card_cols()
     database <- goat_data()
     goat <- if (!is.null(database)) {
-      match_row <- database[as.character(database$`Animal Id`) == clicked_goat_id, ]
-      if (nrow(match_row) > 0) match_row$`Animal Name`[1] else clicked_goat_id
-    } else {
+      match_row <- database[ as.character(database[[ column[["Animal Id"]] ]]) == clicked_goat_id, ]
+      if (nrow(match_row) > 0) match_row[[ column[["Animal Name"]] ]][1] else clicked_goat_id    } else {
       clicked_goat_id
     }
     
@@ -337,10 +431,10 @@ server <- function(input, output, session) {
   observeEvent(input$search_goats, {
     selected_goat(NULL)
   })
-
-
+  
+  
   # RASH'S CODE
-
+  
   # +/- / reset / min / max badge wiring for every input in PARAM_DEFAULTS.
   # The +/- buttons always nudge by 0.5 per the Ag-GOAT notes; numericInput's
   # own `step` is the keyboard-arrow granularity. local() captures pid so the
@@ -357,7 +451,7 @@ server <- function(input, output, session) {
         updateNumericInput(session, pid, value = new_val)
       }
 
-      observeEvent(input[[paste0(pid, "_plus")]],  { bump(1) })
+      observeEvent(input[[paste0(pid, "_plus")]],  { bump( 1) })
       observeEvent(input[[paste0(pid, "_minus")]], { bump(-1) })
       observeEvent(input[[paste0(pid, "_reset")]], {
         updateNumericInput(session, pid, value = default_val)
@@ -392,7 +486,7 @@ server <- function(input, output, session) {
                function(pid) is_valid_number(input[[pid]]),
                logical(1)))
   })
-
+  
   locked_scores_filled <- reactive({
     all(vapply(locked_scores(), is_valid_number, logical(1)))
   })
@@ -402,7 +496,7 @@ server <- function(input, output, session) {
       updateNumericInput(session, pid, value = PARAM_DEFAULTS[[pid]])
     }
   })
-
+  
   # lock the score inputs in when "Create Visual" is clicked. ignoreNULL = FALSE
   # together with default ignoreInit = FALSE fires this once at startup using
   # the param_row defaults, so the plot renders without requiring a click.
@@ -416,7 +510,7 @@ server <- function(input, output, session) {
       teat_placement_score    = input$teat_placement_score
     )
   }, ignoreNULL = FALSE)
-
+  
   # geometry = locked scores + live adjustable params. The validate() here
   # catches the only score-independent failure mode: arch <-> leg intersection
   # placed at or above the rear-udder-height-determined arch vertex, which
@@ -424,7 +518,7 @@ server <- function(input, output, session) {
   geometry <- reactive({
     s <- locked_scores()
     arch_vertex_y <- -input$hock_height *
-                     (1 - score_to_rear_udder_height_pct(s$rear_udder_height_score))
+      (1 - score_to_rear_udder_height_pct(s$rear_udder_height_score))
     validate(need(
       input$arch_leg_y < arch_vertex_y,
       sprintf("Arch leg y (%.1f) must sit below the udder arch vertex (%.2f). Lower the slider, raise the hock, or bump the rear udder height score.",
@@ -438,8 +532,7 @@ server <- function(input, output, session) {
       arch_shape_pad = input$arch_shape_pad
     )
   })
-
-
+  
   # NEW FUCNTION, takes geometrical inch measurement from the linear scores
   teats_poly <- reactive({
     g <- geometry()
@@ -497,7 +590,7 @@ server <- function(input, output, session) {
   output$goat_plot <- renderPlot({
     validate(need(adjustable_params_filled() && locked_scores_filled(),
                   "Please fill out every input with a number."))
-
+    
     g <- ggplot() +
       coord_fixed(xlim = c(-8, 8),
                   ylim = c(view_bottom, view_top), expand = FALSE) +
@@ -544,7 +637,7 @@ server <- function(input, output, session) {
             input$img_opacity, format(input$zoom, nsmall = 1))
   })
 
- # notification system for now, which will eventually be deleted/commented out 
+  # notification system for now, which will eventually be deleted/commented out  
   observeEvent(input$calc_score, {
     showNotification(
       "Linear appraisal score calculation will be wired up to the trained model.",
@@ -570,7 +663,7 @@ server <- function(input, output, session) {
         "Teat Diameter"              = input$teat_diameter_score,
         "Teat Length"                = input$teat_length_score,
         check.names = FALSE
-      )
+        )
       write.csv(export_df, file, row.names = FALSE)
     }
   )
