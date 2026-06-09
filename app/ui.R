@@ -1,19 +1,17 @@
-# document colors:
-  # glossy light green - #A6ED9F
-  # azul mystic - #559FD9
-  # trendy turquoise - #61D3B8
+# UI bundler for the whole app
+# sources all the individual page UIs and stitches them together into a single-page app with a nav bar and progress dots
+
+# also includes the meta tags and font links in the head
+# and imports the stylesheet for the design system
 
 ui <- fluidPage(
-
+ 
   tags$head(
     # Inject iPad / PWA meta tags into the OUTER shinylive document so
-    # "Add to Home Screen" treats this as a standalone app. Doing this from
-    # JS (rather than editing site/index.html post-export) keeps the build
-    # step a single command: shinylive::export("app", "site").
+    # "Add to Home Screen" treats this as a standalone app.
     tags$script(HTML("
       (function () {
         let doc;
-        // adding a meta section in conjunction to the document
         try { doc = window.parent.document; } catch (e) { doc = document; }
         if (!doc) doc = document;
         function meta(n, c) {
@@ -22,344 +20,52 @@ ui <- fluidPage(
           m.name = n; m.content = c;
           doc.head.appendChild(m);
         }
-        // adding meta headers to support apple device usage
         meta('apple-mobile-web-app-capable',         'yes');
         meta('mobile-web-app-capable',               'yes');
         meta('apple-mobile-web-app-status-bar-style','default');
-        meta('apple-mobile-web-app-title',           'Ag-GOAT');
-        meta('theme-color',                          '#559FD9');
+        meta('apple-mobile-web-app-title',           'GOATvzn');
+        meta('theme-color',                          '#2BB5A0');
         meta('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover');
-        doc.title = 'Ag-GOAT';
+        doc.title = 'GOATvzn';
       })();
     ")),
 
-    # when the document loads in, all the numeric inputs are given a required attribute. 
-    # This allows us to use the :invalid CSS selector to style empty inputs with a red border
-
+    # Mark numeric inputs required so the :invalid CSS selector can flag empties.
     tags$script(HTML("
       $(document).on('shiny:connected', function() {
         $('.num-wrap input[type=\"number\"]').attr('required', 'required');
       });
     ")),
 
-    # style definitions
-    tags$style(HTML("
-      body { background: #fafafa; }
-
-      .agheader { display: flex; justify-content: space-between;
-                  align-items: flex-start; margin-bottom: 10px; }
-
-      .agtitle  { font-size: 32px; font-weight: 700; color: #559FD9;
-                  line-height: 1; margin: 0; }
-
-      .agsub    { color: #666; font-size: 12px; max-width: 260px;
-                  margin-top: 4px; }
-
-      .blurb    { color: #555; font-style: italic; font-size: 13px;
-                  margin-bottom: 6px; }
-
-  /* master reset */
-      .master-reset {
-        width: 100%;
-        margin-bottom: 10px;
-        background: #fff;
-        border: 1px solid #559FD9;
-        color: #559FD9;
-        font-weight: 600;
-        font-size: 13px;
-      }
-      .master-reset:hover { background: #eef5fc; color: #3d7fb8; }
-
-  /* section cards */
-      .section-card {
-        background: #f3f3f3;
-        border: 2px solid #999;
-        border-radius: 8px;
-        padding: 8px 10px 6px 10px;
-        margin-bottom: 8px;
-      }
-      .section-title {
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 12px;
-        letter-spacing: 0.5px;
-        margin-bottom: 6px;
-        color: var(--part-dark, #333);
-      }
-
-  /* param definition */
-      .param-row {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        margin-bottom: 4px;
-      }
-      .param-row:last-child { margin-bottom: 0; }
-      .param-label {
-        flex: 1 1 auto;
-        font-size: 12px;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-width: 0;
-      }
-
-  /* badges are <button>s so they can snap the input to min/max on click */
-      .range-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 26px;
-        height: 22px;
-        min-height: 22px !important;
-        padding: 0 6px !important;
-        border-radius: 11px;
-        font-size: 10px;
-        font-weight: 600;
-        flex-shrink: 0;
-        border: none;
-        line-height: 1;
-        cursor: pointer;
-      }
-      .range-badge:hover  { opacity: 0.85; }
-      .range-badge:active { transform: scale(0.95); }
-      .range-light { background: var(--part-light); color: #222; }
-      .range-dark  { background: var(--part-dark);  color: #fff; }
-
-      .tiny-btn {
-        min-width: 26px;
-        height: 28px;
-        padding: 0 4px;
-        font-size: 14px;
-        border: 1px solid #bbb;
-        background: #fff;
-        border-radius: 4px;
-        line-height: 1;
-        flex-shrink: 0;
-        color: #333;
-      }
-      .tiny-btn:hover { background: #eee; }
-
-      .num-wrap { flex-shrink: 0; }
-      .num-wrap .form-group { margin-bottom: 0; }
-      .num-wrap .shiny-input-container { width: auto !important; }
-      .num-wrap input.form-control {
-        height: 28px;
-        padding: 2px 4px;
-        text-align: center;
-        font-size: 16px;
-        width: 62px;
-      }
-
-  /* Empty number inputs are :invalid (because required is set via JS) —
-         drive the red border off of that. Also catches out-of-range values
-         briefly before the server clamps them. */
-      .num-wrap input.form-control:invalid {
-        border-color: #d9534f;
-        background: #fff0f0;
-      }
-
-      .reset-btn {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #fff;
-        border: 1px solid #aaa;
-        font-size: 12px;
-        padding: 0;
-        line-height: 1;
-        flex-shrink: 0;
-        color: #555;
-      }
-      .reset-btn:hover { background: #eee; }
-
-  /* get score button */
-      .calc-btn {
-        width: 100%;
-        min-height: 44px;
-        font-size: 15px;
-        font-weight: 600;
-        background: #61D3B8;
-        border-color: #4cbfa3;
-        color: #fff;
-      }
-      .calc-btn:hover, .calc-btn:focus {
-        background: #4cbfa3;
-        border-color: #3aa68b;
-        color: #fff;
-      }
-
-  /* ---- right column ---- */
-      .image-card {
-        background: #f3f3f3;
-        border: 2px solid #bbb;
-        border-radius: 8px;
-        padding: 10px 12px;
-        margin-top: 14px;
-      }
-      .image-card .form-group { margin-bottom: 6px; }
-      .scale    { color: #888; font-size: 12px; margin-top: 6px; }
-
-  /* iPad / touch-friendly */
-      .btn { min-height: 38px; }
-      .agheader, .section-title { -webkit-user-select: none; user-select: none; }
-      .irs-handle { width: 28px !important; height: 28px !important;
-                    top: 22px !important; }
-
-  /* Stop Safari from auto-zooming text inputs under 16px */
-      select, textarea, .form-control { font-size: 16px; }
-    "))
+    # Lexend font + design system stylesheet
+    tags$link(rel = "preconnect", href = "https://fonts.googleapis.com"),
+    tags$link(rel = "preconnect", href = "https://fonts.gstatic.com", crossorigin = NA),
+    tags$link(rel = "stylesheet",
+              href = "https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&display=swap"),
+    tags$link(rel = "stylesheet", href = "styles.css")
   ),
 
-  # navigation buttons
-  fluidRow(
-    column(12,
-           div(style = "display:flex; justify-content:space-between; margin-bottom:10px;",
-               uiOutput("prev_button"),
-               uiOutput("next_button")
-               )
-    )
-  ),
-  
-  # page system
+  # persistent app bar (logo + SOP reference)
+  nav_bar(),
+
+  # progress dots
+  uiOutput("page_dots"),
+
+  # the 6-step flow
   tabsetPanel(
-    id = "page_tabs",
-    type = "hidden",
-    
-    # input user information page
-    tabPanel("user_information",
-             
-             fluidRow(
-               column(12,
-                      h2("Enter your information"),
-                      textInput("user_name", "Name"),
-                      textInput("user_email", "Email")
-               )
-             )
-    ),
-    
-    # get the goat database from the user
-    tabPanel("goat_database",
-             fluidRow(
-               column(12,
-                      h2("Upload goat database"),
-                      fileInput("goat_database", "Only .csv files accepted",
-                          accept = ".csv")
-               )
-             )
-    ),
-    
-    # goat selection page    
-    tabPanel("goat_selection",
-             fluidRow(
-               column(12,
-                      h2("Select a Goat"),
-                      
-                      div(
-                        style = "width: 100%;",
-                        uiOutput("column_filter"),
-                        uiOutput("value")
-                      ),
-                      
-                      actionButton("search_goats", "Search", 
-                                   class = "btn btn-primary",
-                                   style = "margin-bottom: 15px; width: 100%;"),
-                      
-                      # display area for goat results
-                      uiOutput("goat_results")
-               )
-             )
-    ),
+    id = "page_tabs", type = "hidden",
+    tabPanel("p1", page1_ui()),
+    tabPanel("p2", page2_ui()),
+    tabPanel("p3", page3_ui()),
+    tabPanel("p4", page4_ui()),
+    tabPanel("p5", page5_ui()),
+    tabPanel("p6", page6_ui())
+  ),
 
-    # goat visualizer page
-    tabPanel("goat_visualizer",
-      fluidRow(
-        # left side is the params control
-        column(width = 4,
-
-          div(class = "agheader",
-            div(
-              h1("Ag-GOAT", class = "agtitle"),
-              div(class = "agsub",
-              # duplicated stars here
-                  "Enter the 6 linear appraisal scores, hit ",
-                  tags$b("Create Visual"),
-                  ", then fine-tune hock, legs, and udder-arch attachment below.")
-            )
-          ),
-
-          actionButton("reset_all",
-                       HTML("&#x21bb; Reset all inputs"),
-                       class = "btn master-reset"),
-
-          section_card("Linear Appraisal Scores", "scores",
-            param_row("udder_depth_score",       "udder depth"),
-            param_row("rear_udder_height_score", "rear udder height"),
-            param_row("medial_score",            "medial ligament"),
-            param_row("teat_length_score",       "teat length"),
-            param_row("teat_diameter_score",     "teat diameter"),
-            param_row("teat_placement_score",    "teat placement")
-          ),
-
-          actionButton("create_visual", "Create Visual",
-                       class = "btn calc-btn"),
-
-          br(), br(),
-
-          section_card("Adjustable Parts", "adjustable",
-            param_row("hock_height",    "hock height"),
-            param_row("leg_width",      "leg width"),
-            param_row("arch_leg_y",     "arch leg y"),
-            param_row("arch_shape_pad", "arch roundness")
-          )
-        ),
-
-        # right side has the graph and image overlay controls
-        column(width = 8,
-          div(class = "agheader",
-            div(class = "blurb",
-                "ggplot2-based graph that lets you put an image on the graph,",
-                br(),
-                "and translate, scale, or rotate the image."),
-            div(style = "display: flex; gap: 8px;",
-                downloadButton("export_data", "Export Data", class = "btn-default"),
-                downloadButton("export_png",  "Export PNG",  class = "btn-default")
-            ) 
-          ), # duplicate starts here
-
-          plotOutput("goat_plot", height = "640px"),
-
-          div(class = "image-card",
-            div(class = "section-title",
-                style = "color: #555;", "Image Overlay"),
-            fluidRow(
-              column(6,
-                fileInput("goat_image", "Upload or take a photo of the udder",
-                          accept = "image/*")
-              ),
-              column(6,
-                sliderInput("img_opacity", "image visibility",
-                            min = 0, max = 100, value = 70, step = 5,
-                            post = "%")
-              )
-            ),
-            fluidRow(
-              column(3, sliderInput("zoom",     "zoom",
-                                    min = -3, max = 5, value = 1.5, step = 0.1)),
-              column(3, sliderInput("shift_x",  "shift x",
-                                    min = -10, max = 10, value = -0.5, step = 0.1)),
-              column(3, sliderInput("shift_y",  "shift y",
-                                    min = -15, max = 15, value = -0.5, step = 0.1)),
-              column(3, sliderInput("rotation", "rotation (deg)",
-                                    min = -180, max = 180, value = 0, step = 1))
-            ),
-            div(class = "scale", textOutput("scale_indicator", inline = TRUE))
-          )
-        )
-      )
-    )
-  )
+  # global back / next bar (Next only shows on the linear pages 1-3)
+  div(class = "btn-row between", style = "margin-top:18px;",
+      uiOutput("prev_button"),
+      uiOutput("next_button"))
 )
 
 ui

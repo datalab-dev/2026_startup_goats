@@ -3,6 +3,11 @@
 
 library(shiny)
 
+# a field label with a red required asterisk (HCI #5: error prevention)
+labelMandatory <- function(label) {
+  tagList(label, span(class = "req", style = "color:#E24B4A;", " *"))
+}
+
 param_row <- function(id, label) {
   bounds <- PARAM_BOUNDS[[id]]
   value <- PARAM_DEFAULTS[[id]]
