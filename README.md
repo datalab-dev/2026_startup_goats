@@ -92,7 +92,7 @@ The image below shows the current visualization output generated from the Ag-GOA
 The current prototype allows users to adjust mammary trait parameters and generate a rear-view udder visualization that can be used as a visual reference during development and testing.
 
 
-![Ag-GOAT Week 7 Prototype](images/Ag-GOAT_Week7Progress.png)
+![Ag-GOAT Final Prototype](images/current-prototype.png)
 
 ### Workflow Diagram
 
@@ -241,11 +241,13 @@ docs/                             Supporting documents
 ├── team_agreement.md             Team workflow guidelines and collaboration expectations
 └── userChangeable Points.png     Diagram of user-adjustable scoring parameters
 images/
-├── 325RU.HEIC 						 Sample goat image used for app testing                   
+├── 325RU.HEIC 					  Sample goat image used for app testing                   
 ├── Ag-GOAT_Figma.png             UI design prototype
 ├── Ag-GOAT_Week7Progress.png     Week 7 progress snapshot
+├── current-prototype.png         Current app prototype screenshot
 ├── goat_timeline_workflow.png    Visual timeline of project development stages and milestones
 ├── goat_workflow.png             Diagram showing how project scripts and application components connect
+├── landmark-system-prototype.png Prototype screenshot of the landmark detection system
 └── teat_placement.png            ADGA diagram showing teat placement scoring scale
 .gitignore                        Paths Git should ignore
 README.md                         This file
