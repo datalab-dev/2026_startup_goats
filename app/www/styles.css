@@ -110,6 +110,12 @@ h3 {
   color: var(--teal);
 }
 
+.brand-logo {
+  height: 38px;
+  width: auto;
+  display: block;
+}
+
 .sop-link {
   font-size: 13px;
   font-weight: 600;

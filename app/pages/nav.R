@@ -21,8 +21,8 @@ PAGE_LABELS <- c("Welcome", "Upload", "Select goat",
 nav_bar <- function() {
   div(class = "nav-barr",
     div(class = "brand",
-        span(class = "mark"),
-        span(span(class = "b-goat", "GOAT"), span(class = "b-vzn", "vzn"))
+        tags$img(src = "TEXTGOATvznLogo.png", alt = "GOATvzn",
+                 class = "brand-logo")
     ),
     tags$a(class = "sop-link", href = "https://adga.org/wp-content/uploads/2025/03/2025Linear-SOPDraft1.pdf",
            target = "_blank", rel = "noopener noreferrer",
