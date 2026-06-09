@@ -28,6 +28,15 @@ check_num <- function(x) {
   }
 }
 
+# Resolve a canonical goat column name ("Animal Id", "Animal Name", "Owner Name")
+# to the actual column header in the uploaded CSV. `mapping` is the canonical->actual
+# named vector built on page 2 (rv$goat_card_cols). When there's no mapping (the CSV
+# already had the expected headers) the canonical name is the actual name.
+goat_col <- function(mapping, canonical) {
+  if (is.null(mapping)) return(canonical)
+  mapping[[canonical]] %||% canonical
+}
+
 # uses R's assertions to check if the score is in a valid range from min_score to max_score (default 1-50)
 # throws an error if not, using stop()
 check_score_in_valid_range <- function(score, min_score = 1, max_score = 50) {

@@ -3,13 +3,21 @@ library(ggplot2)
 
 # source shared helpers first, then the curves, score-geometry layer, and UI helper
 source("./R/utils.R")
-source("./R/leg_curve.R")
-source("./R/pelvic_curve.R")
-source("./R/udder_curve.R")
-source("./R/medial_curve.R")
-source("./R/teats_curve.R")
+source("./R/goat_parts/leg_curve.R")
+source("./R/goat_parts/pelvic_curve.R")
+source("./R/goat_parts/udder_curve.R")
+source("./R/goat_parts/medial_curve.R")
+source("./R/goat_parts/teats_curve.R")
 source("./R/score_geometry.R")
 source("./R/ui_helpers.R")
+
+# shared navigation chrome/logic, then the per-page UI + server modules.
+# Each page lives in its own folder pages/<i>_page/ with ui_<i>.R + logic_<i>.R
+source("./pages/nav.R")
+for (i in 1:6) {
+  source(sprintf("./pages/%d_page/ui_%d.R", i, i))
+  source(sprintf("./pages/%d_page/logic_%d.R", i, i))
+}
 
 view_top    <-  3
 view_bottom <- -24

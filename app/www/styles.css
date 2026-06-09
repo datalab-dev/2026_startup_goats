@@ -1,0 +1,913 @@
+/* This css document defines the styles for the and this gets bundled into the app via www/index.html.  */
+
+
+/* css-based variable names particularly for color and sizing */
+:root {
+  /* Brand blobs */
+  --green: #7ED3A2;
+  --teal: #2BB5A0;
+  /* PRIMARY action color */
+  --teal-dark: #1f9486;
+  /* hover / pressed */
+  --teal-tint: #e0f5f2;
+  /* selected row / soft fill */
+  --blue: #3B82C4;
+  --blue-2: #559FD9;
+  /* legacy accent (graph chrome) */
+
+  /* Neutrals */
+  --ink: #1f2937;
+  /* primary text */
+  --muted: #6b7280;
+  /* secondary text */
+  --faint: #9aa3af;
+  /* hints / placeholders */
+  --line: #e2e8e6;
+  /* hairline borders */
+  --surface: #ffffff;
+  /* cards */
+  --page-bg: #f7faf9;
+  /* app background */
+  --row-alt: #fafafa;
+  /* zebra striping */
+  --head-bg: #f0f3f2;
+  /* table header */
+
+  /* Feedback */
+  --error: #E24B4A;
+  --error-bg: #fdecec;
+  --success: #2BB5A0;
+
+  /* Shape & motion */
+  --r-pill: 100px;
+  --r-card: 14px;
+  --r-input: 10px;
+  --shadow: 0 1px 3px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .04);
+  --shadow-lg: 0 8px 24px rgba(16, 24, 40, .10);
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+/* applying the lexend font and the background colors */
+html,
+body {
+  font-family: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--page-bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.container-fluid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 18px 28px;
+}
+
+/* navbar */
+.nav-barr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 2px 10px;
+  margin-bottom: 6px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.brand .mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--green) 0 38%, transparent 39%),
+    radial-gradient(circle at 70% 35%, var(--blue) 0 34%, transparent 35%),
+    radial-gradient(circle at 50% 72%, var(--teal) 0 40%, transparent 41%);
+}
+
+.brand .b-goat {
+  color: var(--ink);
+}
+
+.brand .b-vzn {
+  color: var(--teal);
+}
+
+.sop-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--teal);
+  text-decoration: none;
+  border: 1.5px solid var(--teal);
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sop-link:hover {
+  background: var(--teal-tint);
+  color: var(--teal-dark);
+}
+
+/* pagination for the dots */
+.dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0 18px;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--faint);
+  background: transparent;
+  transition: all .25s var(--ease);
+}
+
+.dot.todo {
+  border-color: var(--faint);
+  background: transparent;
+}
+
+/* not visited */
+.dot.active {
+  border-color: var(--teal);
+  background: var(--teal);
+  transform: scale(1.25);
+}
+
+/* current */
+.dot.done {
+  border-color: var(--teal);
+  background: var(--teal);
+  opacity: .45;
+}
+
+/* completed */
+
+
+
+/* card layout */
+.card-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow);
+  padding: 26px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-title {
+  font-size: 26px;
+  margin: 0 0 4px;
+}
+
+.page-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 22px;
+}
+
+
+
+/* buttons */
+.btn {
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  min-height: 44px;
+  padding: 0 22px;
+  /* center content both axes so text/icons sit in the middle of every button
+     regardless of min-height (browse, save image, nav, etc. all match) */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform .06s var(--ease),
+    background .15s, color .15s, border-color .15s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary,
+.btn.calc-btn {
+  background: var(--teal);
+  border: 1.5px solid var(--teal);
+  color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn.calc-btn:hover,
+.btn.calc-btn:focus {
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
+  color: #fff;
+}
+
+.btn-secondary,
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--teal);
+  color: var(--teal);
+}
+
+.btn-secondary:hover,
+.btn-outline:hover {
+  background: var(--teal-tint);
+  color: var(--teal-dark);
+}
+
+.btn-default {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+}
+
+.btn-default:hover {
+  background: #f3f5f4;
+}
+
+/* Disabled state - self-explanatory, no tooltip needed (HCI #5) */
+.btn[disabled],
+.btn:disabled {
+  opacity: .4;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-row.end {
+  justify-content: flex-end;
+}
+
+.btn-row.between {
+  justify-content: space-between;
+}
+
+
+
+/* form inputs */
+.field {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: none;
+  letter-spacing: .01em;
+}
+
+.field-label .req {
+  color: var(--error);
+  margin-left: 2px;
+}
+
+
+
+/* this set of css code changes shiny's default layout to match the rest of the app*/
+.control-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.shiny-input-container {
+  margin-bottom: 14px;
+}
+
+.form-control,
+.selectize-input,
+input[type="text"],
+input[type="email"] {
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: #f7f8f8;
+  border: 1px solid #ccc;
+  border-radius: var(--r-input);
+  min-height: 44px;
+  box-shadow: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.form-control:focus,
+input:focus,
+.selectize-input.focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(43, 181, 160, .18);
+  outline: none;
+  background: #fff;
+}
+
+.form-control::placeholder {
+  color: var(--faint);
+}
+
+.field.has-error .form-control {
+  border-color: var(--error);
+  background: var(--error-bg);
+}
+
+.help-error {
+  color: var(--error);
+  font-size: 11px;
+  margin-top: 5px;
+  display: none;
+}
+
+.field.has-error .help-error {
+  display: block;
+}
+
+
+/* ---- Blob decorations (non-informational, corners) ---------------- */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: .9;
+  pointer-events: none;
+  z-index: 0;
+  /* gentle hover/float so the corner blobs feel alive */
+  animation: blobFloat 6s ease-in-out infinite;
+}
+
+/* slight vertical drift - kept small so it reads as "hovering" */
+@keyframes blobFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob { animation: none; }
+}
+
+.card-panel>*:not(.blob) {
+  position: relative;
+  z-index: 1;
+}
+
+.blob-tr {
+  top: -40px;
+  right: -30px;
+  width: 150px;
+  height: 150px;
+  background: var(--green);
+  opacity: .18;
+}
+
+.blob-bl {
+  bottom: -50px;
+  left: -40px;
+  width: 180px;
+  height: 180px;
+  background: var(--blue);
+  opacity: .12;
+  /* offset timing so the two blobs drift independently */
+  animation-duration: 7.5s;
+  animation-delay: -2.5s;
+}
+
+/* ---- Success / confirmation screens ------------------------------- */
+.confirm {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.confirm .blobs {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.confirm .blobs span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  transform: scale(0);
+}
+
+.confirm .blobs .g {
+  background: var(--green);
+}
+
+.confirm .blobs .t {
+  background: var(--teal);
+}
+
+.confirm .blobs .b {
+  background: var(--blue);
+}
+
+.confirm.show .blobs .g {
+  animation: blobIn .5s var(--ease) 0ms forwards;
+}
+
+.confirm.show .blobs .t {
+  animation: blobIn .5s var(--ease) 150ms forwards;
+}
+
+.confirm.show .blobs .b {
+  animation: blobIn .5s var(--ease) 300ms forwards;
+}
+
+.confirm .c-title {
+  font-size: 28px;
+  margin: 6px 0 8px;
+}
+
+.confirm .c-title.ok {
+  color: var(--teal);
+}
+
+.confirm .c-title.fail {
+  color: var(--error);
+}
+
+.confirm .c-meta {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+@keyframes blobIn {
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: fadeUp .32s var(--ease);
+}
+
+/* ---- Goat selection cards ----------------------------------------- */
+.search-wrap {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.goat-card {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-left: 4px solid transparent;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+
+.goat-card:hover {
+  background: #f6faf9;
+  box-shadow: var(--shadow);
+}
+
+.goat-card.selected {
+  background: var(--teal-tint);
+  border-color: var(--teal);
+  border-left: 4px solid var(--teal);
+}
+
+.goat-card .g-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+}
+
+.goat-card .g-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 34px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: #fcfdfd;
+}
+
+.empty-state .icon {
+  font-size: 30px;
+  opacity: .5;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.selected-panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+
+
+/* observation table formatting */
+.summary-line {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.summary-line b {
+  color: var(--ink);
+}
+
+.obs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.obs-table th {
+  text-align: left;
+  font-weight: 700;
+  background: var(--head-bg);
+  color: var(--ink);
+  padding: 10px 12px;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.obs-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.obs-table tr:nth-child(even) td {
+  background: var(--row-alt);
+}
+
+.obs-scroll {
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.row-action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--muted);
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.row-action:hover {
+  background: var(--teal-tint);
+  color: var(--teal-dark);
+}
+
+.row-action.del:hover {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+/* style for page 4 - visualizing the goat mammary system */
+.agheader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.agtitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--teal);
+  line-height: 1;
+  margin: 0;
+}
+
+.agsub {
+  color: var(--muted);
+  font-size: 12px;
+  max-width: 260px;
+  margin-top: 4px;
+}
+
+.blurb {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.master-reset {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #fff;
+  border: 1.5px solid var(--teal);
+  color: var(--teal);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: var(--r-pill);
+}
+
+.master-reset:hover {
+  background: var(--teal-tint);
+  color: var(--teal-dark);
+}
+
+
+
+/* card groupings */
+.section-card {
+  background: #f6f8f8;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px 8px;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .6px;
+  margin-bottom: 8px;
+  color: var(--part-dark, #333);
+}
+
+.param-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+.param-row:last-child {
+  margin-bottom: 0;
+}
+
+.param-label {
+  flex: 1 1 auto;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.range-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  min-height: 22px !important;
+  padding: 0 6px !important;
+  border-radius: 11px;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  border: none;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.range-badge:hover {
+  opacity: .85;
+}
+
+.range-badge:active {
+  transform: scale(.95);
+}
+
+.range-light {
+  background: var(--part-light);
+  color: #222;
+}
+
+.range-dark {
+  background: var(--part-dark);
+  color: #fff;
+}
+
+.tiny-btn {
+  min-width: 26px;
+  height: 28px;
+  padding: 0 4px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  color: var(--ink);
+}
+
+.tiny-btn:hover {
+  background: #eee;
+}
+
+.num-wrap {
+  flex-shrink: 0;
+}
+
+.num-wrap .form-group {
+  margin-bottom: 0;
+}
+
+.num-wrap .shiny-input-container {
+  width: auto !important;
+}
+
+.num-wrap input.form-control {
+  height: 30px;
+  padding: 2px 4px;
+  text-align: center;
+  font-size: 16px;
+  width: 62px;
+  min-height: 30px;
+  border-radius: 7px;
+}
+
+.num-wrap input.form-control:invalid {
+  border-color: var(--error);
+  background: var(--error-bg);
+}
+
+.reset-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #bbb;
+  font-size: 12px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.reset-btn:hover {
+  background: #eee;
+}
+
+.calc-btn {
+  width: 100%;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.image-card {
+  background: #f6f8f8;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+
+.image-card .form-group {
+  margin-bottom: 6px;
+}
+
+.scale {
+  color: var(--faint);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.reference-note {
+  font-size: 11px;
+  color: var(--faint);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+
+
+
+.shiny-input-container .input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.shiny-input-container .input-group > * {
+  float: none;
+}
+
+.shiny-input-container .input-group > .input-group-btn,
+.shiny-input-container .input-group > .input-group-prepend {
+  display: flex;
+  width: auto;
+}
+
+.shiny-input-container .input-group .btn-file {
+  min-height: 44px;
+  white-space: nowrap;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.shiny-input-container .input-group .form-control {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Notifications removed by request - hide the toast panel entirely as a
+   safety net in case any showNotification call slips back in. */
+#shiny-notification-panel {
+  display: none !important;
+}
+
+/* touch friendly design */
+.btn {
+  min-height: 44px;
+}
+
+.agheader,
+.section-title {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.irs-handle {
+  width: 28px !important;
+  height: 28px !important;
+  top: 22px !important;
+}
+
+.irs-bar,
+.irs-single,
+.irs-handle>i:first-child {
+  background: var(--teal) !important;
+  border-color: var(--teal) !important;
+}
+
+select,
+textarea,
+.form-control {
+  font-size: 16px;
+}
+
+/* stopping Safari's auto zoom */
+
+@media (max-width: 820px) {
+  .agheader {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

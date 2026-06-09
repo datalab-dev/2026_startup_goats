@@ -44,7 +44,7 @@ check_numeric_input <- function(x) { # checks input if it is numeric
 
 #same thing with this make a util script to call it so it makes it easier to read 
 # this will check if the linear appraisal score is numeric and within the given range
-check_score_in_valid_range <- function(score, min_score, max_score) {
+check_score_in_valid_range <- function(score, min_score=1, max_score=50) {
   check_numeric_input(score)
   
   if (score < min_score || score > max_score) {
