@@ -47,7 +47,7 @@ score_to_udder_depth_inches <- function(s, goat_size = GOAT_SIZE_STANDARD) {
   (s - 15) / 5 * goat_size_factor(goat_size)
 }
 
-# Rear udder height: udder arch position as % of hock->pelvic. Proportional —
+# Rear udder height: udder arch position as % of hock->pelvic. Proportional -
 # breed-independent, so no goat_size term.
 # 10 -> 60%, 20 -> 70%, 30 -> 80%, 40 -> 90%, 50 -> 100%
 score_to_rear_udder_height_pct <- function(s) {
@@ -80,7 +80,7 @@ score_to_teat_diameter_inches <- function(s, goat_size = GOAT_SIZE_STANDARD) {
 }
 
 # Teat placement: fraction of udder half that sits inside the teat
-# center (1 = teat fully outside, 1/3 = teat well inside). Proportional —
+# center (1 = teat fully outside, 1/3 = teat well inside). Proportional -
 # breed-independent, so no goat_size term.
 # 5 -> 1, 15 -> 5/6, 25 -> 2/3, 35 -> 1/2, 45 -> 1/3
 score_to_teat_placement_fraction <- function(s) {
@@ -145,7 +145,7 @@ scores_to_geometry <- function(scores, hock_height, leg_width, arch_leg_y,
   depth_of_medial    <- medial_in / (closeness + 1)^2
 
   # udder arch: vertex y from rear udder height, leg-intersection y from user.
-  # arch_shape_pad (a user-controlled knob, > 0) sets shoulder roundness — a
+  # arch_shape_pad (a user-controlled knob, > 0) sets shoulder roundness - a
   # larger pad gives a gentle, rounded dome; a smaller one steeper, pointier
   # shoulders. It only reshapes the curve between the vertex and arch_leg_y.
   arch_shape    <- leg_width + arch_shape_pad
