@@ -132,7 +132,7 @@ cd 2026_startup_goats
 Then open R or RStudio from the project folder and run:
 
 ```r
-shiny::runApp("app")
+Rscript -e "shiny::runApp('app')"
 ```
 
 The app should open in a browser window. If it does not open automatically, copy the local URL from the R console and paste it into your browser.
